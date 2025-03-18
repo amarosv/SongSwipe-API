@@ -9,32 +9,32 @@ namespace Entidades
     public class Album
     {
         #region Propiedades
-        public int Id { get; set; }
+        public long Id { get; set; }
         public String Title { get; set; }
         public String UPC {  get; set; }
         public String Link { get; set; }
         public String Share { get; set; }
         public String Cover { get; set; }
-        public String CoverSmall { get; set; }
-        public String CoverMedium { get; set; }
-        public String CoverBig { get; set; }
-        public String CoverXL { get; set; }
-        public String MD5Image { get; set; }
-        public int GenreId { get; set; }
+        public String Cover_Small { get; set; }
+        public String Cover_Medium { get; set; }
+        public String Cover_Big { get; set; }
+        public String Cover_XL { get; set; }
+        public String MD5_Image { get; set; }
+        public int Genre_Id { get; set; }
         public List<Genre> Genres { get; set; }
         public String Label { get; set; }
-        public int NbTracks { get; set; }
+        public int Nb_Tracks { get; set; }
         public int Duration { get; set; }
         public int Fans {  get; set; }
-        public String ReleaseDate { get; set; }
-        public String RecordType { get; set; }
+        public String Release_Date { get; set; }
+        public String Record_Type { get; set; }
         public bool Available { get; set; }
         public Album Alternative { get; set; }
         public String TrackList { get; set; }
-        public bool ExplicitLyrics { get; set; }
-        public int ExplicitContentLyrics { get; set; }
-        public int ExplicitContentCover {  get; set; }
-        public List<Object> Contributors { get; set; }
+        public bool Explicit_Lyrics { get; set; }
+        public int Explicit_Content_Lyrics { get; set; }
+        public int Explicit_Content_Cover {  get; set; }
+        public List<Contributor> Contributors { get; set; }
         public Object Fallback {  get; set; }
         public Artist Artist { get; set; }
         public List<Track> Tracks { get; set; }
@@ -43,7 +43,7 @@ namespace Entidades
         #region Constructores 
         public Album() { }
 
-        public Album(int id , string title, string uPC, string link, string share, string cover, string coverSmall, string coverMedium, string coverBig, string coverXL, string mD5Image, int genreId, List<Genre> genres, string label, int nbTracks, int duration, int fans, string releaseDate, string recordType, bool available, Album alternative, string trackList, bool explicitLyrics, int explicitContentLyrics, int explicitContentCover, List<object> contributors, object fallback, Artist artist, List<Track> tracks)
+        public Album(long id , string title, string uPC, string link, string share, string cover, string coverSmall, string coverMedium, string coverBig, string coverXL, string mD5Image, int genreId, List<Genre> genres, string label, int nbTracks, int duration, int fans, string releaseDate, string recordType, bool available, Album alternative, string trackList, bool explicitLyrics, int explicitContentLyrics, int explicitContentCover, List<Contributor> contributors, object fallback, Artist artist, List<Track> tracks)
         {
             Id = id;
             Title = title;
@@ -51,25 +51,25 @@ namespace Entidades
             Link = link;
             Share = share;
             Cover = cover;
-            CoverSmall = coverSmall;
-            CoverMedium = coverMedium;
-            CoverBig = coverBig;
-            CoverXL = coverXL;
-            MD5Image = mD5Image;
-            GenreId = genreId;
+            Cover_Small = coverSmall;
+            Cover_Medium = coverMedium;
+            Cover_Big = coverBig;
+            Cover_XL = coverXL;
+            MD5_Image = mD5Image;
+            Genre_Id = genreId;
             Genres = genres;
             Label = label;
-            NbTracks = nbTracks;
+            Nb_Tracks = nbTracks;
             Duration = duration;
             Fans = fans;
-            ReleaseDate = releaseDate;
-            RecordType = recordType;
+            Release_Date = releaseDate;
+            Record_Type = recordType;
             Available = available;
             Alternative = alternative;
             TrackList = trackList;
-            ExplicitLyrics = explicitLyrics;
-            ExplicitContentLyrics = explicitContentLyrics;
-            ExplicitContentCover = explicitContentCover;
+            Explicit_Lyrics = explicitLyrics;
+            Explicit_Content_Lyrics = explicitContentLyrics;
+            Explicit_Content_Cover = explicitContentCover;
             Contributors = contributors;
             Fallback = fallback;
             Artist = artist;

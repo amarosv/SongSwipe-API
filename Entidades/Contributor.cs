@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
-    public class Artist
+    public class Contributor
     {
         #region Propiedades
         public long Id { get; set; }
@@ -16,32 +16,30 @@ namespace Entidades
         public String Picture { get; set; }
         public String Picture_Small { get; set; }
         public String Picture_Medium { get; set; }
-        public String Picture_Big { get; set; }
         public String Picture_XL { get; set; }
-        public int Nb_Album {  get; set; }
-        public int Nb_Fans { get; set; }
         public bool Radio { get; set; }
         public String TrackList { get; set; }
+        public String Type { get; set; }
+        public String Role { get; set; }
         #endregion
 
         #region Constructores
-        public Artist() { }
+        public Contributor() { }
 
-        public Artist(long id, string name, string link, string share, string picture, string pictureSmall, string pictureMedium, string pictureBig, string pictureXL, int nbAlbum, int nbFans, bool radio, string trackList)
+        public Contributor(long id, string name, string link, string share, string picture, string picture_Small, string picture_Medium, string picture_XL, bool radio, string trackList, string type, string role)
         {
             Id = id;
             Name = name;
             Link = link;
             Share = share;
             Picture = picture;
-            Picture_Small = pictureSmall;
-            Picture_Medium = pictureMedium;
-            Picture_Big = pictureBig;
-            Picture_XL = pictureXL;
-            Nb_Album = nbAlbum;
-            Nb_Fans = nbFans;
+            Picture_Small = picture_Small;
+            Picture_Medium = picture_Medium;
+            Picture_XL = picture_XL;
             Radio = radio;
             TrackList = trackList;
+            Type = type;
+            Role = role;
         }
         #endregion
     }
