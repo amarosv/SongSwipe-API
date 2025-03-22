@@ -10,13 +10,13 @@ namespace DTO
     public class UserSwipes
     {
         #region Atributos
-        private User _user;
+        private Usuario _user;
         private List<int> _likedTracks;
         private List<int> _dislikedTracks;
         #endregion
 
         #region Propiedades
-        public User User { 
+        public Usuario User { 
             get { return _user; } 
             set { _user = value; } 
         }
@@ -37,7 +37,7 @@ namespace DTO
         #region Constructores
         public UserSwipes() { }
 
-        public UserSwipes(User user, List<int> likedTracks, List<int> dislikedTracks)
+        public UserSwipes(Usuario user, List<int> likedTracks, List<int> dislikedTracks)
         {
             _user = user;
             _likedTracks = likedTracks;

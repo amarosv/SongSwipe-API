@@ -2,7 +2,7 @@
 
 namespace Entidades
 {
-    public class User
+    public class Usuario
     {
         #region Atributos
         private String _uid;
@@ -120,9 +120,9 @@ namespace Entidades
         #endregion
 
         #region Constructores
-        public User() { }
+        public Usuario() { }
 
-        public User(string uid, string name, string lastName, string email, string photoURL, string dateJoining, string username, bool userDeleted, bool userBlocked)
+        public Usuario(string uid, string name, string lastName, string email, string photoURL, string dateJoining, string username, bool userDeleted, bool userBlocked)
         {
             if (!string.IsNullOrEmpty(uid))
             {

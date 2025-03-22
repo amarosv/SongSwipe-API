@@ -1,4 +1,5 @@
 ﻿using Azure;
+using DAL.Utils;
 using DTO;
 using Entidades;
 using Microsoft.Data.SqlClient;
@@ -8,13 +9,73 @@ using System.Windows.Input;
 
 namespace DAL
 {
-    public class Listados
+    public class ListadosDAL
     {
         private static readonly HttpClient _httpClient = new HttpClient();
         private const string DeezerApiUrl = "https://api.deezer.com/";
         private const int MaxRequestsPerWindow = 50;
         private static DateTime _lastRequestTime = DateTime.MinValue;
         private static int _requestCount = 0;
+
+        /// <summary>
+        /// Esta función obtiene todos los usuarios de la base de datos y los devuelve como una lista
+        /// </summary>
+        /// <returns>Lista</returns>
+        public static List<Usuario> getAllUsers()
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+
+            Usuario user = null;
+            String uid = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String username = "";
+            bool blocked = false;
+            bool deleted = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "SELECT * FROM USERS WHERE UserDeleted = 0 AND UserBlocked = 0";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uid = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        deleted = (bool)miLector["UserDeleted"];
+                        blocked = (bool)miLector["UserBlocked"];
+
+                        user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, deleted, blocked);
+                        usuarios.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
 
         /// <summary>
         /// Esta función recibe el uid de un usuario, obtiene las canciones que le han gustado
@@ -24,7 +85,7 @@ namespace DAL
         /// <param name="page">Número de página</param>
         /// <param name="limit">Número de canciones por página</param>
         /// <returns>Objeto con información y lista de canciones</returns>
-        public static async Task<PaginatedTracks> getLikedTracks(String uid, int page, int limit, String baseUrl)
+        public static async Task<PaginatedTracks> getLikedTracksDAL(String uid, int page, int limit, String baseUrl)
         {
             PaginatedTracks paginatedTracks = new PaginatedTracks();
             List<Track> tracks = new List<Track>();
@@ -90,7 +151,7 @@ namespace DAL
         /// <param name="page">Número de página</param>
         /// <param name="limit">Número de canciones por página</param>
         /// <returns>Objeto con información y lista de canciones</returns>
-        public static async Task<List<Track>> getDisLikedTracks(String uid, int page, int limit, String baseUrl)
+        public static async Task<PaginatedTracks> getDisLikedTracksDAL(String uid, int page, int limit, String baseUrl)
         {
             PaginatedTracks paginatedTracks = new PaginatedTracks();
             List<Track> tracks = new List<Track>();

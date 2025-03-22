@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace DAL
+namespace DAL.Utils
 {
     public class clsConexion
     {

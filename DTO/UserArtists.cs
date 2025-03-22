@@ -5,12 +5,12 @@ namespace DTO
     public class UserArtists
     {
         #region Atributos
-        private User _user;
+        private Usuario _user;
         private List<int> _artists;
         #endregion
 
         #region Propiedades
-        public User User
+        public Usuario User
         {
             get { return _user; }
         }
@@ -24,7 +24,7 @@ namespace DTO
         #region Constructores
         public UserArtists() {}
 
-        public UserArtists(User user, List<int> artists) { 
+        public UserArtists(Usuario user, List<int> artists) { 
             _user = user;
             _artists = artists;
         }
