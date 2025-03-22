@@ -1,6 +1,9 @@
-﻿using Entidades;
+﻿using Azure;
+using DTO;
+using Entidades;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace DAL
@@ -18,19 +21,34 @@ namespace DAL
         /// y las devuelve como una lista
         /// </summary>
         /// <param name="uid">UID del usuario</param>
-        /// <returns>Lista de canciones</returns>
-        public static async Task<List<Track>> getLikedTracks(String uid)
+        /// <param name="page">Número de página</param>
+        /// <param name="limit">Número de canciones por página</param>
+        /// <returns>Objeto con información y lista de canciones</returns>
+        public static async Task<PaginatedTracks> getLikedTracks(String uid, int page, int limit, String baseUrl)
         {
+            PaginatedTracks paginatedTracks = new PaginatedTracks();
             List<Track> tracks = new List<Track>();
 
             // Primero obtenemos los ids de las canciones de la base de datos
-            List<long> tracksId = getTracksIds("EXEC GetLikedTracks @UID", uid);
+            var result = getTracksIds("EXEC GetLikedTracks @UID, @page, @limit", uid, page, limit);
+
+            // Calcular total de canciones
+            int offset = (page - 1) * limit + 1;
+
+            if (page > 1)
+            {
+                paginatedTracks.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
+            }
+
+            if (page < result.totalPages) {
+                paginatedTracks.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
+            }
 
             // Crear una lista de tareas para manejar las peticiones de forma concurrente
             List<Task<Track>> trackTasks = new List<Task<Track>>();
 
             // Se añaden las tareas a la lista
-            foreach (long trackId in tracksId)
+            foreach (long trackId in result.tracks)
             {
                 // Verificamos si la canción ya está en el cache
                 if (TrackCache.TryGetTrack(trackId, out Track cachedTrack))
@@ -53,7 +71,15 @@ namespace DAL
                 tracks.Add(track);
             }
 
-            return tracks;
+            // Asignar valores al objeto paginado
+            paginatedTracks.Page = page;
+            paginatedTracks.TotalPages = result.totalPages;
+            paginatedTracks.Offset = offset;
+            paginatedTracks.Last = offset + tracks.Count - 1;
+            paginatedTracks.Limit = limit;
+            paginatedTracks.Tracks = tracks;
+
+            return paginatedTracks;
         }
 
         /// <summary>
@@ -61,19 +87,34 @@ namespace DAL
         /// y las devuelve como una lista
         /// </summary>
         /// <param name="uid">UID del usuario</param>
-        /// <returns>Lista de canciones</returns>
-        public static async Task<List<Track>> getDisLikedTracks(String uid)
+        /// <param name="page">Número de página</param>
+        /// <param name="limit">Número de canciones por página</param>
+        /// <returns>Objeto con información y lista de canciones</returns>
+        public static async Task<List<Track>> getDisLikedTracks(String uid, int page, int limit, String baseUrl)
         {
+            PaginatedTracks paginatedTracks = new PaginatedTracks();
             List<Track> tracks = new List<Track>();
 
             // Primero obtenemos los ids de las canciones de la base de datos
-            List<long> tracksId = getTracksIds("EXEC GetDislikedTracks @UID", uid);
+            var result = getTracksIds("EXEC GetDisLikedTracks @UID, @page, @limit", uid, page, limit);
+
+            // Calcular total de canciones
+            int offset = (page - 1) * limit + 1;
+            if (page > 1)
+            {
+                paginatedTracks.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
+            }
+
+            if (page < result.totalPages)
+            {
+                paginatedTracks.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
+            }
 
             // Crear una lista de tareas para manejar las peticiones de forma concurrente
             List<Task<Track>> trackTasks = new List<Task<Track>>();
 
             // Se añaden las tareas a la lista
-            foreach (long trackId in tracksId)
+            foreach (long trackId in result.tracks)
             {
                 // Verificamos si la canción ya está en el cache
                 if (TrackCache.TryGetTrack(trackId, out Track cachedTrack))
@@ -96,7 +137,15 @@ namespace DAL
                 tracks.Add(track);
             }
 
-            return tracks;
+            // Asignar valores al objeto paginado
+            paginatedTracks.Page = page;
+            paginatedTracks.TotalPages = result.totalPages;
+            paginatedTracks.Offset = offset;
+            paginatedTracks.Last = offset + tracks.Count - 1;
+            paginatedTracks.Limit = limit;
+            paginatedTracks.Tracks = tracks;
+
+            return paginatedTracks;
         }
 
         private static async Task<Track> HandleRateLimitAndGetTrack(long trackId)
@@ -113,8 +162,6 @@ namespace DAL
             return null;
         }
 
-
-
         /// <summary>
         /// Esta función obtiene los ids de las canciones de la base de datos
         /// y los devuelve como una lista
@@ -122,10 +169,12 @@ namespace DAL
         /// <param name="procedure">Procedure a ejecutar</param>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de ids de canciones</returns>
-        private static List<long> getTracksIds(String procedure, String uid)
+        private static (int totalPages, List<long> tracks) getTracksIds(String procedure, String uid, int page, int limit)
         {
             // Obtenemos de la DB los ids de las canciones que le han gustado
             List<long> tracksId = new List<long>();
+            int totalPages = 0;
+
             SqlCommand miComando = new SqlCommand();
             SqlDataReader miLector;
 
@@ -135,15 +184,25 @@ namespace DAL
 
                 miComando.CommandText = procedure;
                 miComando.Parameters.AddWithValue("@UID", uid);
+                miComando.Parameters.AddWithValue("@page", page);
+                miComando.Parameters.AddWithValue("@limit", limit);
                 miLector = miComando.ExecuteReader();
 
                 if (miLector.HasRows)
                 {
-                    while (miLector.Read())
+                    if (miLector.Read())
                     {
-                        long idTrack = (long)miLector["IDTrack"];
+                        totalPages = miLector.GetInt32(0);
+                    }
 
-                        tracksId.Add(idTrack);
+                    if (miLector.NextResult())
+                    {
+                        while (miLector.Read())
+                        {
+                            long idTrack = (long)miLector["IDTrack"];
+
+                            tracksId.Add(idTrack);
+                        }
                     }
                 }
             }
@@ -156,7 +215,7 @@ namespace DAL
                 clsConexion.Desconectar();
             }
 
-            return tracksId;
+            return (totalPages, tracksId);
         }
 
         private static async Task HandleRateLimit()

@@ -1,4 +1,5 @@
 ﻿using DAL;
+using DTO;
 using Entidades;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,21 +20,33 @@ namespace Back.Controllers.API
 
         // GET api/<User>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(String id)
+        public async Task<IActionResult> Get(String id, int page, int limit)
         {
             IActionResult salida;
 
-            List<Track> listadoCompleto = new List<Track>();
+            PaginatedTracks paginatedTracks;
+
+            if (page == 0) {
+                page = 1;
+            }
+
+            if (limit == 0)
+            {
+                limit = 10;
+            }
+
+            String baseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
             try
             {
-                listadoCompleto = await Listados.getLikedTracks(id);
-                if (listadoCompleto.Count() == 0)
+                paginatedTracks = await Listados.getLikedTracks(id, page, limit, baseUrl);
+                if (paginatedTracks == null)
                 {
                     salida = NotFound("No se ha encontrado ninguna canción");
                 }
                 else
                 {
-                    salida = Ok(listadoCompleto);
+                    salida = Ok(paginatedTracks);
                 }
             }
             catch (Exception e)
