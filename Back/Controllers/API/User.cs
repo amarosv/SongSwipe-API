@@ -392,6 +392,32 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/check-username
+        [HttpGet("check-username/{username}")]
+        [SwaggerOperation(
+            Summary = "Comprueba que no exista el username",
+            Description = "Este método obtiene un username y comprueba que no exista en la base de datos<br>" +
+            "Devuelve un boolean"
+        )]
+        [SwaggerResponse(200, "Comprobado", typeof(bool))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetCheckUsername(String username)
+        {
+            IActionResult salida;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                bool exists = MetodosDAL.checkUsername(username);
+                
+                salida = Ok(exists);
+            } else
+            {
+                salida = BadRequest("Username no válido");
+            }
+
+            return salida;
+        }
+
         // POST api/<User>
         [HttpPost]
         [SwaggerOperation(

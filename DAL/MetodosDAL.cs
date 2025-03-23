@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -178,6 +179,47 @@ namespace DAL
             }
 
             return numFilasAfectadas;
+        }
+    
+        /// <summary>
+        /// Esta función recibe un username y comprueba que no exista en la base de datos
+        /// </summary>
+        /// <param name="username">Username a comprobar</param>
+        /// <returns>Existe o no</returns>
+        public static bool checkUsername(String username)
+        {
+            bool exists = false;
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = username;
+                miComando.CommandText = "SELECT COUNT(*) AS TOTAL FROM USERS WHERE Username = @username";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        int total = (int)miLector["TOTAL"];
+
+                        exists = total > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return exists;
         }
     }
 }
