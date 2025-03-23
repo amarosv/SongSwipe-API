@@ -137,5 +137,47 @@ namespace DAL
 
             return numFilasAfectadas;
         }
+    
+        /// <summary>
+        /// Esta función recibe un usuario modificado y lo actualiza en la base de datos
+        /// </summary>
+        /// <param name="user">Usuario modificado</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int updateUser(Usuario user)
+        {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = user.UID;
+                miComando.Parameters.Add("@name", System.Data.SqlDbType.VarChar).Value = user.Name;
+                miComando.Parameters.Add("@lastName", System.Data.SqlDbType.VarChar).Value = user.LastName;
+                miComando.Parameters.Add("@email", System.Data.SqlDbType.VarChar).Value = user.Email;
+                miComando.Parameters.Add("@photoUrl", System.Data.SqlDbType.VarChar).Value = user.PhotoURL;
+                miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = user.Username;
+                miComando.Parameters.Add("@deleted", System.Data.SqlDbType.Bit).Value = user.UserDeleted;
+                miComando.Parameters.Add("@blocked", System.Data.SqlDbType.Bit).Value = user.UserBlocked;
+
+                miComando.CommandText = "UPDATE USERS " +
+                    "SET Name = @name, LastName = @lastName, Email = @email, PhotoUrl = @photoUrl, Username = @username " +
+                    "WHERE UID = @uid";
+
+                numFilasAfectadas = miComando.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return numFilasAfectadas;
+        }
     }
 }

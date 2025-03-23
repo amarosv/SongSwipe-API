@@ -209,6 +209,315 @@ namespace DAL
             return paginatedTracks;
         }
 
+        /// <summary>
+        /// Esta función recibe el uid de un usuario, busca sus amigos y los devuelve como una lista
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getFriendsDAL(String uid)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+            Usuario user = null;
+            String uidUser = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String username = "";
+            bool blocked = false;
+            bool deleted = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetUserFriends @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUser = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        deleted = (bool)miLector["UserDeleted"];
+                        blocked = (bool)miLector["UserBlocked"];
+
+                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, deleted, blocked);
+                        usuarios.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
+        
+        /// <summary>
+        /// Esta función recibe el uid de un usuario, busca las solicitudes de amistad que le han llegado y las devuelve como una lista
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getIncomingFriendRequestsDAL(String uid)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+            Usuario user = null;
+            String uidUser = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String username = "";
+            bool blocked = false;
+            bool deleted = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetIncomingFriendRequests @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUser = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        deleted = (bool)miLector["UserDeleted"];
+                        blocked = (bool)miLector["UserBlocked"];
+
+                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, deleted, blocked);
+                        usuarios.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
+
+        /// <summary>
+        /// Esta función recibe el uid de un usuario, busca las solicitudes de amistad que ha enviado y las devuelve como una lista
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getOutgoingFriendRequestsDAL(String uid)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+            Usuario user = null;
+            String uidUser = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String username = "";
+            bool blocked = false;
+            bool deleted = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetOutgoingFriendRequests @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUser = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        deleted = (bool)miLector["UserDeleted"];
+                        blocked = (bool)miLector["UserBlocked"];
+
+                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, deleted, blocked);
+                        usuarios.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
+
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y la id de una canción y busca los amigos del usuario que le han gustado la canción
+        /// y los devuelve como una lista
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="trackId">ID de la canción</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getFriendsWhoLikedTrackDAL(String uid, long trackId)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+            Usuario user = null;
+            String uidUser = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String username = "";
+            bool blocked = false;
+            bool deleted = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetFriendsWhoLikedTrack @UID, @IDTrack";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miComando.Parameters.AddWithValue("@IDTrack", trackId);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUser = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        deleted = (bool)miLector["UserDeleted"];
+                        blocked = (bool)miLector["UserBlocked"];
+
+                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, deleted, blocked);
+                        usuarios.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y obtiene de la base de datos los usuarios que este ha bloqueado
+        /// y los devuelve como una lista
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getUsersBlockedDAL(String uid)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+            Usuario user = null;
+            String uidUser = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String username = "";
+            bool blocked = false;
+            bool deleted = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetBlockedUsers @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUser = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        deleted = (bool)miLector["UserDeleted"];
+                        blocked = (bool)miLector["UserBlocked"];
+
+                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, deleted, blocked);
+                        usuarios.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
+
         private static async Task<Track> HandleRateLimitAndGetTrack(long trackId)
         {
             await HandleRateLimit();

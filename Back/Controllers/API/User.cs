@@ -83,6 +83,208 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/friends
+        [HttpGet("{uid}/friends")]
+        [SwaggerOperation(
+            Summary = "Obtiene los amigos de un usuario",
+            Description = "Este método obtiene todos los amigos de un usuario especificado por su UID.<br>" +
+            "Si no se encuentra ningun amigo se devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de amigos", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se ha encontrado ningún amigo para ese usuario")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetFriends(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+
+            List<Usuario> usuarios;
+
+            try
+            {
+                usuarios = ListadosDAL.getFriendsDAL(uid);
+
+                if (usuarios == null || usuarios.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún amigo para ese usuario");
+                }
+                else
+                {
+                    salida = Ok(usuarios);
+                }
+            }
+            catch (Exception ex)
+            {
+                salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/inrequests
+        [HttpGet("{uid}/inrequests")]
+        [SwaggerOperation(
+            Summary = "Obtiene las solicitudes de amistad entrantes",
+            Description = "Este método obtiene todas las solicitudes de amistad entrantes de un usuario y las devuelve como una lista.<br>" +
+            "Si no se encuentra ninguna solicitud entrante se devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de solicitudes de amistad entrante", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna solicitud de amistad entrante para ese usuario")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetIncomingFriendRequests(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+
+            List<Usuario> usuarios;
+
+            try
+            {
+                usuarios = ListadosDAL.getIncomingFriendRequestsDAL(uid);
+
+                if (usuarios == null || usuarios.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ninguna solicitud de amistad entrante para ese usuario");
+                }
+                else
+                {
+                    salida = Ok(usuarios);
+                }
+            }
+            catch (Exception ex)
+            {
+                salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/outrequests
+        [HttpGet("{uid}/outrequests")]
+        [SwaggerOperation(
+            Summary = "Obtiene las solicitudes de amistad entrantes",
+            Description = "Este método obtiene todas las solicitudes de amistad enviadas de un usuario y las devuelve como una lista.<br>" +
+            "Si no se encuentra ninguna solicitud saliente se devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de solicitudes de amistad enviadas", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna solicitud de amistad saliente para ese usuario")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetOutgoingFriendRequests(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+
+            List<Usuario> usuarios;
+
+            try
+            {
+                usuarios = ListadosDAL.getOutgoingFriendRequestsDAL(uid);
+
+                if (usuarios == null || usuarios.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ninguna solicitud de amistad saliente para ese usuario");
+                }
+                else
+                {
+                    salida = Ok(usuarios);
+                }
+            }
+            catch (Exception ex)
+            {
+                salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/friendslikedtrack/1
+        [HttpGet("{uid}/friendslikedtrack/{idTrack}")]
+        [SwaggerOperation(
+            Summary = "Obtiene los amigos que le han dado \"me gusta\" a la canción",
+            Description = "Este método obtiene todos los amigos del usuario que le han dado \"me gusta\" a la canción y los devuelve como una lista.<br>" +
+            "Si no se encuentra ningun amigo que le haya dado \"me gusta\" se devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de amigos", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se ha encontrado ningún amigo que le haya dado \"me gusta\" a esta canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetFriendsWhoLikedTrack(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "ID de la canción")]
+            long idTrack
+        )
+        {
+            IActionResult salida;
+
+            List<Usuario> usuarios;
+
+            try
+            {
+                usuarios = ListadosDAL.getFriendsWhoLikedTrackDAL(uid, idTrack);
+
+                if (usuarios == null || usuarios.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún amigo que le haya dado \"me gusta\" a esta canción");
+                }
+                else
+                {
+                    salida = Ok(usuarios);
+                }
+            }
+            catch (Exception ex)
+            {
+                salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/blocked
+        [HttpGet("{uid}/blocked")]
+        [SwaggerOperation(
+            Summary = "Obtiene los usuarios que el usuario ha bloqueado",
+            Description = "Este método obtiene todos los usuarios que el usuario ha bloqueado y los devuelve como una lista.<br>" +
+            "Si no se encuentra ningun usuario bloqueado se devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de usuarios bloqueados", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se ha encontrado ningún usuario bloqueado")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetBlocked(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+
+            List<Usuario> usuarios;
+
+            try
+            {
+                usuarios = ListadosDAL.getUsersBlockedDAL(uid);
+
+                if (usuarios == null || usuarios.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún usuario bloqueado");
+                }
+                else
+                {
+                    salida = Ok(usuarios);
+                }
+            }
+            catch (Exception ex)
+            {
+                salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
         // GET api/<User>/5/liked
         [HttpGet("{uid}/liked")]
         [SwaggerOperation(
@@ -225,9 +427,43 @@ namespace Back.Controllers.API
         }
 
         // PUT api/<User>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("{uid}")]
+        [SwaggerOperation(
+            Summary = "Obtiene un UID de usuario, un usuario actualizado y lo actualiza en la base de datos",
+            Description = "Este método obtiene un UID de usuario, el usuario actualizado y lo actualiza de la base de datos.<br>" +
+            "Si no se ha podido actualizar devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(404, "No se ha podido actualizar al usuario")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult Put(
+            [SwaggerParameter(Description = "UID del usuario a actualizar")]
+            String uid,
+            [SwaggerParameter(Description = "Usuario actualizado")]
+            [FromBody] Usuario user)
         {
+            IActionResult salida;
+
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosDAL.updateUser(user);
+
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound("No se ha podido actualizar al usuario");
+                }
+                else
+                {
+                    salida = Ok(user);
+                }
+            }
+            catch (Exception e) {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
         }
 
         // DELETE api/<User>/5
