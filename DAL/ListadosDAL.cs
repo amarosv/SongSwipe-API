@@ -78,6 +78,69 @@ namespace DAL
         }
 
         /// <summary>
+        /// Esta función recibe un username y busca en la base de datos todos los usuarios que su username concuerde con el recibido
+        /// y los devuelve como una lista
+        /// </summary>
+        /// <param name="username">Username a buscar</param>
+        /// <returns>Lista</returns>
+        public static List<Usuario> getUsersByUsername(String username)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+
+            Usuario user = null;
+            String uid = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String usernameUser = "";
+            bool blocked = false;
+            bool deleted = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = "%" + username + "%";
+                miComando.CommandText = "SELECT * FROM USERS WHERE Username LIKE @username AND UserDeleted = 0 AND UserBlocked = 0";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uid = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        usernameUser = (String)miLector["Username"];
+                        deleted = (bool)miLector["UserDeleted"];
+                        blocked = (bool)miLector["UserBlocked"];
+
+                        user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, usernameUser, deleted, blocked);
+                        usuarios.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
+
+        /// <summary>
         /// Esta función recibe el uid de un usuario, obtiene las canciones que le han gustado
         /// y las devuelve como una lista
         /// </summary>

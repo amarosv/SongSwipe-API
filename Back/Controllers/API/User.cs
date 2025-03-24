@@ -20,7 +20,7 @@ namespace Back.Controllers.API
             "Si no se encuentra ningun usuario devuelve un mensaje de error."
         )]
         [SwaggerResponse(200, "Lista de usarios obtenida correctamente", typeof(List<Usuario>))]
-        [SwaggerResponse(404, "No se encontraron usuarios")]
+        [SwaggerResponse(404, "No se ha encontrado ningún usuario")]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult Get()
         {
@@ -46,8 +46,46 @@ namespace Back.Controllers.API
             return salida;
         }
 
-        // GET api/<User>/5
-        [HttpGet("{uid}")]
+        // GET: api/<User>/username/username
+        [HttpGet("username/{username}")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con todos los usuarios activos cuyo username concuerde con el especificado",
+            Description = "Este método obtiene todas los usuarios activos (desbloqueados y no eliminados) cuyo username concuerde con el especificado y los devuelve como un listado.<br>" +
+            "Si no se encuentra ningun usuario devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de usarios obtenida correctamente", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se ha encontrado ningún usuario con ese username")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetByUsername(String username)
+        {
+            IActionResult salida;
+
+            List<Usuario> lista = null;
+
+            try
+            {
+                lista = ListadosDAL.getUsersByUsername(username);
+
+                if (lista == null || lista.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún usuario con ese username");
+                }
+                else
+                {
+                    salida = Ok(lista);
+                }
+            }
+            catch (Exception ex)
+            {
+                salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+
+            // GET api/<User>/5
+            [HttpGet("{uid}")]
         [SwaggerOperation(
             Summary = "Obtiene los datos de un usuario específico",
             Description = "Este método obtiene todos los datos de un usuario especificado por su UID.<br>" +
