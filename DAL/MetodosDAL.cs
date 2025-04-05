@@ -238,10 +238,16 @@ namespace DAL
             try
             {
                 miComando.Connection = clsConexion.GetConnection();
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
 
-                foreach (int id in artists) {
-                    miComando.Parameters.Add("@IDArtist", System.Data.SqlDbType.BigInt).Value = id;
+                foreach (long id in artists) {
+                    // Crear un nuevo parámetro para cada iteración
+                    SqlParameter uidUser = miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar);
+                    uidUser.Value = uid;
+                    SqlParameter idArtistParam = new SqlParameter("@IDArtist", System.Data.SqlDbType.BigInt);
+                    idArtistParam.Value = id;
+                    miComando.Parameters.Clear();  // Limpiar los parámetros previos
+                    miComando.Parameters.Add(uidUser);
+                    miComando.Parameters.Add(idArtistParam);  // Añadir el nuevo parámetro
 
                     miComando.CommandText = "INSERT INTO USERARTISTS (UID, IDArtist) VALUES (@uid, @IDArtist)";
                     numFilasAfectadas += miComando.ExecuteNonQuery();
@@ -273,11 +279,17 @@ namespace DAL
             try
             {
                 miComando.Connection = clsConexion.GetConnection();
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
 
-                foreach (int id in genres)
+                foreach (long id in genres)
                 {
-                    miComando.Parameters.Add("@IDGenre", System.Data.SqlDbType.BigInt).Value = id;
+                    // Crear un nuevo parámetro para cada iteración
+                    SqlParameter uidUser = miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar);
+                    uidUser.Value = uid;
+                    SqlParameter idGenreParam = new SqlParameter("@IDGenre", System.Data.SqlDbType.BigInt);
+                    idGenreParam.Value = id;
+                    miComando.Parameters.Clear();  // Limpiar los parámetros previos
+                    miComando.Parameters.Add(uidUser);
+                    miComando.Parameters.Add(idGenreParam);  // Añadir el nuevo parámetro
 
                     miComando.CommandText = "INSERT INTO USERGENRES (UID, IDGenre) VALUES (@uid, @IDGenre)";
                     numFilasAfectadas += miComando.ExecuteNonQuery();

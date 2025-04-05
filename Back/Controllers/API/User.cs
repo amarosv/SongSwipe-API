@@ -509,7 +509,7 @@ namespace Back.Controllers.API
                 numFilasAfectadas = MetodosDAL.addArtistsToFavorites(uid, artistas);
                 if (numFilasAfectadas == 0)
                 {
-                    salida = NotFound("No se ha podido añadir a los artistas como favoritos");
+                    salida = NotFound(numFilasAfectadas);
                 }
                 else
                 {
@@ -543,7 +543,7 @@ namespace Back.Controllers.API
                 numFilasAfectadas = MetodosDAL.addGenresToFavorites(uid, generos);
                 if (numFilasAfectadas == 0)
                 {
-                    salida = NotFound("No se ha podido añadir los géneros como favoritos");
+                    salida = NotFound(numFilasAfectadas);
                 }
                 else
                 {
