@@ -490,6 +490,75 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // POST api/<User>/5/artists
+        [HttpPost("{uid}/artists")]
+        [SwaggerOperation(
+            Summary = "Obtiene el UID de un usuario y una lista de ids de artistas y lo guarda en la base de datos",
+            Description = "Este método obtiene un UID de un usuario y una lista de ids de artistas y lo guarda en la base de datos.<br>" +
+            "Devuelve el número de filas afectadads"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult PostArtistas(String uid, [FromBody] List<int> artistas)
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosDAL.addArtistsToFavorites(uid, artistas);
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound("No se ha podido añadir a los artistas como favoritos");
+                }
+                else
+                {
+                    salida = Ok(numFilasAfectadas);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // POST api/<User>/5/genres
+        [HttpPost("{uid}/genres")]
+        [SwaggerOperation(
+            Summary = "Obtiene el UID de un usuario y una lista de ids de géneros y lo guarda en la base de datos",
+            Description = "Este método obtiene un UID de un usuario y una lista de ids de géneros y lo guarda en la base de datos.<br>" +
+            "Devuelve el número de filas afectadads"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult PostGeneros(String uid, [FromBody] List<int> generos)
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosDAL.addGenresToFavorites(uid, generos);
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound("No se ha podido añadir los géneros como favoritos");
+                }
+                else
+                {
+                    salida = Ok(numFilasAfectadas);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+
         // PUT api/<User>/5
         [HttpPut("{uid}")]
         [SwaggerOperation(

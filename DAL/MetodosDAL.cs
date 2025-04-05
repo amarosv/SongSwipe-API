@@ -221,5 +221,79 @@ namespace DAL
 
             return exists;
         }
+        
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y la lista con los ids de los artistas a guardar como favoritos y los
+        /// guarda en la base de datos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="artists">Lista de ids de los artistas</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int addArtistsToFavorites(String uid, List<int> artists)
+        {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+
+                foreach (int id in artists) {
+                    miComando.Parameters.Add("@IDArtist", System.Data.SqlDbType.BigInt).Value = id;
+
+                    miComando.CommandText = "INSERT INTO USERARTISTS (UID, IDArtist) VALUES (@uid, @IDArtist)";
+                    numFilasAfectadas += miComando.ExecuteNonQuery();
+                }
+
+            } catch (Exception ex) {
+                throw;
+            } finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return numFilasAfectadas;
+        }
+
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y la lista con los ids de los géneros a guardar como favoritos y los
+        /// guarda en la base de datos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="genres">Lista de ids de los géneros</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int addGenresToFavorites(String uid, List<int> genres)
+        {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+
+                foreach (int id in genres)
+                {
+                    miComando.Parameters.Add("@IDGenre", System.Data.SqlDbType.BigInt).Value = id;
+
+                    miComando.CommandText = "INSERT INTO USERGENRES (UID, IDGenre) VALUES (@uid, @IDGenre)";
+                    numFilasAfectadas += miComando.ExecuteNonQuery();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return numFilasAfectadas;
+        }
     }
 }
