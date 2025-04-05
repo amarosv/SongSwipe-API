@@ -229,7 +229,7 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="artists">Lista de ids de los artistas</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int addArtistsToFavorites(String uid, List<int> artists)
+        public static int addArtistsToFavorites(String uid, List<long> artists)
         {
             int numFilasAfectadas = 0;
 
@@ -264,7 +264,7 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="genres">Lista de ids de los géneros</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int addGenresToFavorites(String uid, List<int> genres)
+        public static int addGenresToFavorites(String uid, List<long> genres)
         {
             int numFilasAfectadas = 0;
 

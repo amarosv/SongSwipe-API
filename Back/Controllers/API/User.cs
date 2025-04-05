@@ -499,7 +499,7 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult PostArtistas(String uid, [FromBody] List<int> artistas)
+        public IActionResult PostArtistas(String uid, [FromBody] List<long> artistas)
         {
             IActionResult salida;
             int numFilasAfectadas = 0;
@@ -533,7 +533,7 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult PostGeneros(String uid, [FromBody] List<int> generos)
+        public IActionResult PostGeneros(String uid, [FromBody] List<long> generos)
         {
             IActionResult salida;
             int numFilasAfectadas = 0;
