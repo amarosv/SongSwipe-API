@@ -16,21 +16,40 @@ namespace DTO
         #endregion
 
         #region Propiedades
-        public Usuario User { 
-            get { return _user; } 
-            set { _user = value; } 
+        public Usuario User
+        {
+            get { return _user; }
+            set
+            {
+                if (value != null)
+                {
+                    _user = value;
+                }
+            }
         }
 
         public List<int> LikedTracks
         {
             get { return _likedTracks; }
-            set { _likedTracks = value; }
+            set
+            {
+                if (value != null)
+                {
+                    _likedTracks = value;
+                }
+            }
         }
 
         public List<int> DislikedTracks
         {
             get { return _dislikedTracks; }
-            set { _dislikedTracks = value; }
+            set
+            {
+                if (value != null)
+                {
+                    _dislikedTracks = value;
+                }
+            }
         }
         #endregion
 
@@ -39,9 +58,20 @@ namespace DTO
 
         public UserSwipes(Usuario user, List<int> likedTracks, List<int> dislikedTracks)
         {
-            _user = user;
-            _likedTracks = likedTracks;
-            _dislikedTracks = dislikedTracks;
+            if (user != null)
+            {
+                _user = user;
+            }
+
+            if (likedTracks != null)
+            {
+                _likedTracks = likedTracks;
+            }
+
+            if (dislikedTracks != null)
+            {
+                _dislikedTracks = dislikedTracks;
+            }
         }
         #endregion
     }

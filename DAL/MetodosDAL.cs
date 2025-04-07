@@ -1,4 +1,6 @@
-﻿using DAL.Utils;
+﻿using Azure;
+using DAL.Utils;
+using DTO;
 using Entidades;
 using Microsoft.Data.SqlClient;
 using System;
@@ -306,6 +308,67 @@ namespace DAL
             }
 
             return numFilasAfectadas;
+        }
+        
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y devuelve la información a mostrar en la pantalla de perfil
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Usuario con los datos a mostrar en el perfil</returns>
+        public static UserProfile getUserProfileData(String uid)
+        {
+            UserProfile userProfile = null;
+            String uidUser = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String photoUrl = "";
+            String dateJoining = "";
+            String username = "";
+            int savedSongs;
+            int followers;
+            int following;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetUserProfileData @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUser = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        savedSongs = (int)miLector["SavedSongs"];
+                        followers = (int)miLector["Followers"];
+                        following = (int)miLector["Following"];
+
+                        userProfile = new UserProfile(uid, username, name, lastName, photoUrl, dateJoining, email, savedSongs, followers, following);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return userProfile;
         }
     }
 }

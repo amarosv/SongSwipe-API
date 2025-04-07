@@ -3,6 +3,7 @@ using DTO;
 using Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Generic;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -430,7 +431,7 @@ namespace Back.Controllers.API
             return salida;
         }
 
-        // GET api/<User>/check-username
+        // GET api/<User>/check-username/asasas
         [HttpGet("check-username/{username}")]
         [SwaggerOperation(
             Summary = "Comprueba que no exista el username",
@@ -443,14 +444,56 @@ namespace Back.Controllers.API
         {
             IActionResult salida;
 
-            if (!string.IsNullOrEmpty(username))
+            try
             {
-                bool exists = MetodosDAL.checkUsername(username);
+                if (!string.IsNullOrEmpty(username))
+                {
+                    bool exists = MetodosDAL.checkUsername(username);
+
+                    salida = Ok(exists);
+                }
+                else
+                {
+                    salida = BadRequest("Username no válido");
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/profile
+        [HttpGet("profile")]
+        [SwaggerOperation(
+            Summary = "Obtiene los datos a mostrar en la pantalla de perfil de usuario",
+            Description = "Este método obtiene los datos a mostrar en la pantalla de perfil de usuario<br>" +
+            "Si no se encuentran datos, devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Usuario con los datos a mostrar", typeof(UserProfile))]
+        [SwaggerResponse(404, "No se han encontrado datos")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetUserProfileData(String uid)
+        {
+            IActionResult salida;
+            UserProfile userProfile = null;  
+
+            try
+            {
+                userProfile = MetodosDAL.getUserProfileData(uid);
+
+                if (userProfile == null)
+                {
+                    salida = NotFound("No se han encontrado datos");
+                } else
+                {
+                    salida = Ok(userProfile);
+                }
                 
-                salida = Ok(exists);
-            } else
-            {
-                salida = BadRequest("Username no válido");
+            } catch (Exception e) {
+                salida = BadRequest(e.Message);
             }
 
             return salida;
