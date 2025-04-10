@@ -85,8 +85,8 @@ namespace Back.Controllers.API
         }
 
 
-            // GET api/<User>/5
-            [HttpGet("{uid}")]
+        // GET api/<User>/5
+        [HttpGet("{uid}")]
         [SwaggerOperation(
             Summary = "Obtiene los datos de un usuario específico",
             Description = "Este método obtiene todos los datos de un usuario especificado por su UID.<br>" +
@@ -465,8 +465,8 @@ namespace Back.Controllers.API
             return salida;
         }
 
-        // GET api/<User>/profile
-        [HttpGet("profile")]
+        // GET api/<User>/5/profile
+        [HttpGet("{uid}/profile")]
         [SwaggerOperation(
             Summary = "Obtiene los datos a mostrar en la pantalla de perfil de usuario",
             Description = "Este método obtiene los datos a mostrar en la pantalla de perfil de usuario<br>" +
@@ -475,7 +475,10 @@ namespace Back.Controllers.API
         [SwaggerResponse(200, "Usuario con los datos a mostrar", typeof(UserProfile))]
         [SwaggerResponse(404, "No se han encontrado datos")]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult GetUserProfileData(String uid)
+        public IActionResult GetUserProfileData(
+            [SwaggerParameter(Description = "UID del usuario a obtener sus datos")] 
+            String uid
+        )
         {
             IActionResult salida;
             UserProfile userProfile = null;  
