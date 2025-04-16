@@ -502,6 +502,46 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/settings
+        [HttpGet("{uid}/settings")]
+        [SwaggerOperation(
+            Summary = "Obtiene los ajustes de usuario",
+            Description = "Este método obtiene los ajustes de usuario<br>" +
+            "Si no se encuentran ajustes, devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Ajustes del usuairo", typeof(Settings))]
+        [SwaggerResponse(404, "No se han encontrado ajustes")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetUserSettings(
+            [SwaggerParameter(Description = "UID del usuario a obtener sus ajustes")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            Settings settings = null;
+
+            try
+            {
+                settings = MetodosDAL.getUserSettings(uid);
+
+                if (settings == null)
+                {
+                    salida = NotFound("No se han encontrado ajustes");
+                }
+                else
+                {
+                    salida = Ok(settings);
+                }
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>
         [HttpPost]
         [SwaggerOperation(

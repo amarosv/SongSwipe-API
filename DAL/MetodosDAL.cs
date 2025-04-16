@@ -370,5 +370,83 @@ namespace DAL
 
             return userProfile;
         }
+        
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y devuelve sus ajustes
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Ajustes del usuario</returns>
+        public static Settings getUserSettings(String uid) {
+            Settings settings = null;
+            int mode;
+            int theme;
+            bool cardAnimatedCover;
+            bool cardSkipSongs;
+            bool cardBlurredCoverAsBackground;
+            int privacyVisSavedSongs;
+            int privacyVisStats;
+            int privacyVisFol;
+            bool privateAccount;
+            string language;
+            bool audioLoop;
+            bool audioAutoPlay;
+            bool audioOnlyAudio;
+            bool notifications;
+            bool notiFriendsRequest;
+            bool notiFriendsApproved;
+            bool notiAppUpdate;
+            bool notiAppRecap;
+            bool notiAccountBlocked;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetUserSettings @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        mode = (int)miLector["Mode"];
+                        theme = (int)miLector["Theme"];
+                        cardAnimatedCover = (bool)miLector["Card_Animated_Cover"];
+                        cardSkipSongs = (bool)miLector["Card_Skip_Songs"];
+                        cardBlurredCoverAsBackground = (bool)miLector["Card_Blurred_Cover_As_Background"];
+                        privacyVisSavedSongs = (int)miLector["Privacy_Vis_Saved_Songs"];
+                        privacyVisStats = (int)miLector["Privacy_Vis_Stats"];
+                        privacyVisFol = (int)miLector["Privacy_Vis_Fol"];
+                        privateAccount = (bool)miLector["Private_Account"];
+                        language = (string)miLector["Language"];
+                        audioLoop = (bool)miLector["Audio_Loop"];
+                        audioAutoPlay = (bool)miLector["Audio_Autoplay"];
+                        audioOnlyAudio = (bool)miLector["Audio_Only_Audio"];
+                        notifications = (bool)miLector["Notifications"];
+                        notiFriendsRequest = (bool)miLector["Noti_Friends_Request"];
+                        notiFriendsApproved = (bool)miLector["Noti_Friends_Approved"];
+                        notiAppUpdate = (bool)miLector["Noti_App_Update"];
+                        notiAppRecap = (bool)miLector["Noti_App_Recap"];
+                        notiAccountBlocked = (bool)miLector["Noti_Account_Blocked"];
+
+                        settings = new Settings(mode, theme, cardAnimatedCover, cardSkipSongs, cardBlurredCoverAsBackground, privacyVisSavedSongs, privacyVisStats, privacyVisFol, privateAccount, language, audioLoop, audioAutoPlay, audioOnlyAudio, notifications, notiFriendsRequest, notiFriendsApproved, notiAppUpdate, notiAppRecap, notiAccountBlocked);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return settings;
+        }
     }
 }
