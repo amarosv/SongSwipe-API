@@ -28,6 +28,7 @@ namespace DAL
             String photoUrl = "";
             String dateJoining = "";
             String username = "";
+            String supplier = "";
             bool blocked = false;
             bool deleted = false;
 
@@ -51,10 +52,11 @@ namespace DAL
                         photoUrl = (String)miLector["PhotoUrl"];
                         dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
                         username = (String)miLector["Username"];
+                        supplier = (String)miLector["Supplier"];
                         deleted = (bool)miLector["UserDeleted"];
                         blocked = (bool)miLector["UserBlocked"];
 
-                        user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, deleted, blocked);
+                        user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
                     }
                 }
             }
