@@ -204,7 +204,7 @@ namespace Back.Controllers.API
         // GET api/<User>/5/outrequests
         [HttpGet("{uid}/outrequests")]
         [SwaggerOperation(
-            Summary = "Obtiene las solicitudes de amistad entrantes",
+            Summary = "Obtiene las solicitudes de amistad salientes",
             Description = "Este método obtiene todas las solicitudes de amistad enviadas de un usuario y las devuelve como una lista.<br>" +
             "Si no se encuentra ninguna solicitud saliente se devuelve un mensaje de error."
         )]
