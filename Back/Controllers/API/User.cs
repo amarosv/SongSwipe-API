@@ -578,6 +578,40 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/check-email/a@gmail.com
+        [HttpGet("check-email/{email}")]
+        [SwaggerOperation(
+            Summary = "Comprueba que no exista el email",
+            Description = "Este método obtiene un email y comprueba que no exista en la base de datos<br>" +
+            "Devuelve un boolean"
+        )]
+        [SwaggerResponse(200, "Comprobado", typeof(bool))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetCheckEmail(String email)
+        {
+            IActionResult salida;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(email))
+                {
+                    bool exists = MetodosUserDAL.checkEmail(email);
+
+                    salida = Ok(exists);
+                }
+                else
+                {
+                    salida = BadRequest("Email no válido");
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // GET api/<User>/5/profile
         [HttpGet("{uid}/profile")]
         [SwaggerOperation(
