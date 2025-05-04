@@ -448,5 +448,225 @@ namespace DAL
 
             return settings;
         }
+
+        /// <summary>
+        /// Esta función recibe los ajustes de un usuario modificados y los actualiza en la base de datos
+        /// </summary>
+        /// <param name="settings">Ajustes modificados</param>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int updateUserSettings(Settings settings, String uid)
+        {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@mode", System.Data.SqlDbType.Int).Value = settings.Mode;
+                miComando.Parameters.Add("@theme", System.Data.SqlDbType.Bit).Value = settings.Theme;
+                miComando.Parameters.Add("@cardAnimatedCover", System.Data.SqlDbType.Bit).Value = settings.CardAnimatedCover;
+                miComando.Parameters.Add("@cardSkipSongs", System.Data.SqlDbType.Bit).Value = settings.CardSkipSongs;
+                miComando.Parameters.Add("@cardBlurredCoverAsBackground", System.Data.SqlDbType.Bit).Value = settings.CardBlurredCoverAsBackground;
+                miComando.Parameters.Add("@privacyVisSavedSongs", System.Data.SqlDbType.Int).Value = settings.PrivacyVisSavedSongs;
+                miComando.Parameters.Add("@privacyVisStats", System.Data.SqlDbType.Int).Value = settings.PrivacyVisStats;
+                miComando.Parameters.Add("@privacyVisFol", System.Data.SqlDbType.Int).Value = settings.PrivacyVisFol;
+                miComando.Parameters.Add("@privateAccount", System.Data.SqlDbType.Bit).Value = settings.PrivateAccount;
+                miComando.Parameters.Add("@language", System.Data.SqlDbType.VarChar).Value = settings.Language;
+                miComando.Parameters.Add("@audioLoop", System.Data.SqlDbType.Bit).Value = settings.AudioLoop;
+                miComando.Parameters.Add("@audioAutoPlay", System.Data.SqlDbType.Bit).Value = settings.AudioAutoPlay;
+                miComando.Parameters.Add("@audioOnlyAudio", System.Data.SqlDbType.Bit).Value = settings.AudioOnlyAudio;
+                miComando.Parameters.Add("@notifications", System.Data.SqlDbType.Bit).Value = settings.Notifications;
+                miComando.Parameters.Add("@notiFriendRequest", System.Data.SqlDbType.Bit).Value = settings.NotiFriendsRequest;
+                miComando.Parameters.Add("@notiFriendApproved", System.Data.SqlDbType.Bit).Value = settings.NotiFriendsApproved;
+                miComando.Parameters.Add("@notiAppUpdate", System.Data.SqlDbType.Bit).Value = settings.NotiAppUpdate;
+                miComando.Parameters.Add("@notiAppRecap", System.Data.SqlDbType.Bit).Value = settings.NotiAppRecap;
+                miComando.Parameters.Add("@notiAccountBlocked", System.Data.SqlDbType.Bit).Value = settings.NotiAccountBlocked;
+
+                miComando.CommandText = "UPDATE USERSETTINGS " +
+                    "SET Mode = @mode, Theme = @theme, Card_Animated_Cover = @cardAnimatedCover, Card_Skip_Songs = @cardSkipSongs," +
+                    "Card_Blurred_Cover_As_Background = @cardBlurredCoverAsBackground, Privacy_Vis_Saved_Songs = @privacyVisSavedSongs," +
+                    "Privacy_Vis_Stats = @privacyVisStats, Privacy_Vis_Fol = @privacyVisFol, Private_Account = @privateAccount, Language = @language," +
+                    "Audio_Loop = @audioLoop, Audio_Autoplay = @audioAutoPlay, Audio_Only_Audio = @audioOnlyAudio, Notifications = @notifications," +
+                    "Noti_Friends_Request = @notiFriendRequest, Noti_Friend_Approved = @notiFriendApproved, Noti_App_Update = @notiAppUpdate," +
+                    "Noti_App_Recap = @notiAppRecap, Noti_Account_Blocked = @notiAccountBlocked " +
+                    "WHERE UID = @uid";
+
+                numFilasAfectadas = miComando.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return numFilasAfectadas;
+        }
+
+        /// <summary>
+        /// Esta función recibe el id de una canción y devuelve el número de likes de esta
+        /// </summary>
+        /// <param name="idTrack">ID de la canción</param>
+        /// <returns>Número de likes</returns>
+        public static int getLikesByTrack(long idTrack)
+        {
+            int likes = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetLikesTrack @IDTrack";
+                miComando.Parameters.AddWithValue("@IDTrack", idTrack);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        likes = (int)miLector["LIKES"];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return likes;
+        }
+
+        /// <summary>
+        /// Esta función recibe el id de una canción y devuelve el número de dislikes de esta
+        /// </summary>
+        /// <param name="idTrack">ID de la canción</param>
+        /// <returns>Número de dislikes</returns>
+        public static int getDislikesByTrack(long idTrack)
+        {
+            int dislikes = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetDislikesTrack @IDTrack";
+                miComando.Parameters.AddWithValue("@IDTrack", idTrack);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        dislikes = (int)miLector["DISLIKES"];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return dislikes;
+        }
+
+        /// <summary>
+        /// Esta función recibe el id de un álbum y devuelve el número de likes de este
+        /// </summary>
+        /// <param name="idAlbum">ID del album</param>
+        /// <returns>Número de likes</returns>
+        public static int getLikesByAlbum(long idAlbum)
+        {
+            int likes = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetLikesAlbum @IDAlbum";
+                miComando.Parameters.AddWithValue("@IDAlbum", idAlbum);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        likes = (int)miLector["LIKES"];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return likes;
+        }
+
+        /// <summary>
+        /// Esta función recibe el id de un álbum y devuelve el número de dislikes de este
+        /// </summary>
+        /// <param name="idAlbum">ID del album</param>
+        /// <returns>Número de dislikes</returns>
+        public static int getDislikesByAlbum(long idAlbum)
+        {
+            int dislikes = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetDislikesAlbum @IDAlbum";
+                miComando.Parameters.AddWithValue("@IDAlbum", idAlbum);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        dislikes = (int)miLector["DISLIKES"];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return dislikes;
+        }
     }
 }
