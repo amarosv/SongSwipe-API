@@ -821,7 +821,7 @@ namespace Back.Controllers.API
                 }
                 else
                 {
-                    salida = Ok(settings);
+                    salida = Ok("Ajustes actualizados correctamente");
                 }
             }
             catch (Exception e)

@@ -491,7 +491,7 @@ namespace DAL
                     "Card_Blurred_Cover_As_Background = @cardBlurredCoverAsBackground, Privacy_Vis_Saved_Songs = @privacyVisSavedSongs," +
                     "Privacy_Vis_Stats = @privacyVisStats, Privacy_Vis_Fol = @privacyVisFol, Private_Account = @privateAccount, Language = @language," +
                     "Audio_Loop = @audioLoop, Audio_Autoplay = @audioAutoPlay, Audio_Only_Audio = @audioOnlyAudio, Notifications = @notifications," +
-                    "Noti_Friends_Request = @notiFriendRequest, Noti_Friend_Approved = @notiFriendApproved, Noti_App_Update = @notiAppUpdate," +
+                    "Noti_Friends_Request = @notiFriendRequest, Noti_Friends_Approved = @notiFriendApproved, Noti_App_Update = @notiAppUpdate," +
                     "Noti_App_Recap = @notiAppRecap, Noti_Account_Blocked = @notiAccountBlocked " +
                     "WHERE UID = @uid";
 
