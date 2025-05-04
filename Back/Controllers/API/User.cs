@@ -338,7 +338,7 @@ namespace Back.Controllers.API
             String uid,
             [SwaggerParameter(Description = "Número de página de la que obtener las canciones")]
             int page,
-            [SwaggerParameter(Description = "Número de canciones que se muestran por página")]
+            [SwaggerParameter(Description = "Número de canciones que se muestran por página (Máximo 50)")]
             int limit)
         {
             IActionResult salida;
@@ -352,6 +352,9 @@ namespace Back.Controllers.API
             if (limit == 0)
             {
                 limit = 10;
+            } else if (limit > 50)
+            {
+                limit = 50;
             }
 
             String baseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
@@ -391,7 +394,7 @@ namespace Back.Controllers.API
             String uid,
             [SwaggerParameter(Description = "Número de página de la que obtener las canciones")]
             int page,
-            [SwaggerParameter(Description = "Número de canciones que se muestran por página")]
+            [SwaggerParameter(Description = "Número de canciones que se muestran por página (Máximo 50)")]
             int limit)
         {
             IActionResult salida;
@@ -406,6 +409,9 @@ namespace Back.Controllers.API
             if (limit == 0)
             {
                 limit = 10;
+            } else if (limit > 50)
+            {
+                limit = 50;
             }
 
             String baseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
