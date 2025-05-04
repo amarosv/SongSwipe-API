@@ -31,7 +31,7 @@ namespace Back.Controllers.API
 
             try
             {
-                lista = ListadosDAL.getAllUsers();
+                lista = ListadosUserDAL.getAllUsers();
 
                 if (lista == null || lista.Count == 0) {
                     salida = NotFound("No se ha encontrado ningún usuario");
@@ -65,7 +65,7 @@ namespace Back.Controllers.API
 
             try
             {
-                lista = ListadosDAL.getUsersByUsername(username);
+                lista = ListadosUserDAL.getUsersByUsername(username);
 
                 if (lista == null || lista.Count == 0)
                 {
@@ -83,7 +83,6 @@ namespace Back.Controllers.API
 
             return salida;
         }
-
 
         // GET api/<User>/5
         [HttpGet("{uid}")]
@@ -106,7 +105,7 @@ namespace Back.Controllers.API
 
             try
             {
-                user = MetodosDAL.getUserByUIDDAL(uid);
+                user = MetodosUserDAL.getUserByUIDDAL(uid);
 
                 if (user == null) {
                     salida = NotFound("No se ha encontrado ningún usuario con ese UID");
@@ -143,7 +142,7 @@ namespace Back.Controllers.API
 
             try
             {
-                usuarios = ListadosDAL.getFriendsDAL(uid);
+                usuarios = ListadosUserDAL.getFriendsDAL(uid);
 
                 if (usuarios == null || usuarios.Count == 0)
                 {
@@ -183,7 +182,7 @@ namespace Back.Controllers.API
 
             try
             {
-                usuarios = ListadosDAL.getIncomingFriendRequestsDAL(uid);
+                usuarios = ListadosUserDAL.getIncomingFriendRequestsDAL(uid);
 
                 if (usuarios == null || usuarios.Count == 0)
                 {
@@ -223,7 +222,7 @@ namespace Back.Controllers.API
 
             try
             {
-                usuarios = ListadosDAL.getOutgoingFriendRequestsDAL(uid);
+                usuarios = ListadosUserDAL.getOutgoingFriendRequestsDAL(uid);
 
                 if (usuarios == null || usuarios.Count == 0)
                 {
@@ -265,7 +264,7 @@ namespace Back.Controllers.API
 
             try
             {
-                usuarios = ListadosDAL.getFriendsWhoLikedTrackDAL(uid, idTrack);
+                usuarios = ListadosUserDAL.getFriendsWhoLikedTrackDAL(uid, idTrack);
 
                 if (usuarios == null || usuarios.Count == 0)
                 {
@@ -305,7 +304,7 @@ namespace Back.Controllers.API
 
             try
             {
-                usuarios = ListadosDAL.getUsersBlockedDAL(uid);
+                usuarios = ListadosUserDAL.getUsersBlockedDAL(uid);
 
                 if (usuarios == null || usuarios.Count == 0)
                 {
@@ -359,7 +358,7 @@ namespace Back.Controllers.API
 
             try
             {
-                paginatedTracks = await ListadosDAL.getLikedTracksDAL(uid, page, limit, baseUrl);
+                paginatedTracks = await ListadosUserDAL.getLikedTracksDAL(uid, page, limit, baseUrl);
                 if (paginatedTracks.Tracks.Count == 0)
                 {
                     salida = NotFound("No se ha encontrado ninguna canción");
@@ -413,7 +412,7 @@ namespace Back.Controllers.API
 
             try
             {
-                paginatedTracks = await ListadosDAL.getDisLikedTracksDAL(uid, page, limit, baseUrl);
+                paginatedTracks = await ListadosUserDAL.getDisLikedTracksDAL(uid, page, limit, baseUrl);
                 if (paginatedTracks.Tracks.Count == 0)
                 {
                     salida = NotFound("No se ha encontrado ninguna canción");
@@ -421,6 +420,114 @@ namespace Back.Controllers.API
                 else
                 {
                     salida = Ok(paginatedTracks);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/artists
+        [HttpGet("{uid}/artists")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con todos los artistas seguidos por el usuario",
+            Description = "Este método obtiene todos los artistas seguidos y los devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de artistas obtenida correctamente", typeof(List<PaginatedArtists>))]
+        [SwaggerResponse(404, "No se ha encontrado ningún artista")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetFavoriteArtists(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "Número de página de la que obtener los artistas")]
+            int page,
+            [SwaggerParameter(Description = "Número de artistas que se muestran por página")]
+            int limit)
+        {
+            IActionResult salida;
+
+            PaginatedArtists paginatedArtists;
+
+            if (page == 0)
+            {
+                page = 1;
+            }
+
+            if (limit == 0)
+            {
+                limit = 10;
+            }
+
+            String baseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+            try
+            {
+                paginatedArtists = await ListadosUserDAL.getFavArtistsDAL(uid, page, limit, baseUrl);
+                if (paginatedArtists.Artists.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún artista");
+                }
+                else
+                {
+                    salida = Ok(paginatedArtists);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/genres
+        [HttpGet("{uid}/genres")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con todos los géneros que el usuario ha marcado como favoritos",
+            Description = "Este método obtiene todos los géneros que el usuario ha marcado como favoritos y los devuelve como un listado.<br>" +
+            "Si no se encuentra ningún género devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de géneros obtenida correctamente", typeof(List<PaginatedGenres>))]
+        [SwaggerResponse(404, "No se ha encontrado ningún artista")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetFavoriteGenres(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "Número de página de la que obtener los géneros")]
+            int page,
+            [SwaggerParameter(Description = "Número de géneros que se muestran por página")]
+            int limit)
+        {
+            IActionResult salida;
+
+            PaginatedGenres paginatedGenres;
+
+            if (page == 0)
+            {
+                page = 1;
+            }
+
+            if (limit == 0)
+            {
+                limit = 10;
+            }
+
+            String baseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+            try
+            {
+                paginatedGenres = await ListadosUserDAL.getFavGenresDAL(uid, page, limit, baseUrl);
+                if (paginatedGenres.Genres.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún género");
+                }
+                else
+                {
+                    salida = Ok(paginatedGenres);
                 }
             }
             catch (Exception e)
@@ -448,7 +555,7 @@ namespace Back.Controllers.API
             {
                 if (!string.IsNullOrEmpty(username))
                 {
-                    bool exists = MetodosDAL.checkUsername(username);
+                    bool exists = MetodosUserDAL.checkUsername(username);
 
                     salida = Ok(exists);
                 }
@@ -485,7 +592,7 @@ namespace Back.Controllers.API
 
             try
             {
-                userProfile = MetodosDAL.getUserProfileData(uid);
+                userProfile = MetodosUserDAL.getUserProfileData(uid);
 
                 if (userProfile == null)
                 {
@@ -522,7 +629,7 @@ namespace Back.Controllers.API
 
             try
             {
-                settings = MetodosDAL.getUserSettings(uid);
+                settings = MetodosUserDAL.getUserSettings(uid);
 
                 if (settings == null)
                 {
@@ -558,7 +665,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosDAL.createUser(user);
+                numFilasAfectadas = MetodosUserDAL.createUser(user);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound("No se ha podido crear el usuario");
@@ -592,7 +699,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosDAL.addArtistsToFavorites(uid, artistas);
+                numFilasAfectadas = MetodosUserDAL.addArtistsToFavorites(uid, artistas);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
@@ -626,7 +733,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosDAL.addGenresToFavorites(uid, generos);
+                numFilasAfectadas = MetodosUserDAL.addGenresToFavorites(uid, generos);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
@@ -643,7 +750,6 @@ namespace Back.Controllers.API
 
             return salida;
         }
-
 
         // PUT api/<User>/5
         [HttpPut("{uid}")]
@@ -667,7 +773,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosDAL.updateUser(user);
+                numFilasAfectadas = MetodosUserDAL.updateUser(user);
 
                 if (numFilasAfectadas == 0)
                 {
@@ -684,6 +790,48 @@ namespace Back.Controllers.API
 
             return salida;
         }
+
+        // PUT api/<User>/settings/5
+        [HttpPut("{uid}/settings")]
+        [SwaggerOperation(
+            Summary = "Obtiene un UID de usuario, sus ajustes actualizados y lo actualiza en la base de datos",
+            Description = "Este método obtiene un UID de usuario, sus ajustes actualizados y lo actualiza de la base de datos.<br>" +
+            "Si no se ha podido actualizar devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(404, "No se ha podido actualizar los ajustes")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult PutAjustes(
+            [SwaggerParameter(Description = "UID del usuario a actualizar")]
+            String uid,
+            [SwaggerParameter(Description = "Ajustes actualizados")]
+            [FromBody] Settings settings)
+        {
+            IActionResult salida;
+
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.updateUserSettings(settings, uid);
+
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound("No se ha podido actualizar los ajustes");
+                }
+                else
+                {
+                    salida = Ok(settings);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
 
         // DELETE api/<User>/5
         [HttpDelete("{uid}")]
@@ -704,7 +852,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosDAL.deleteUser(uid);
+                numFilasAfectadas = MetodosUserDAL.deleteUser(uid);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound("No se ha podido eliminar al usuario");

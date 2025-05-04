@@ -21,7 +21,7 @@ namespace Entidades
         public String Cover_XL { get; set; }
         public String MD5_Image { get; set; }
         public int Genre_Id { get; set; }
-        public List<Genre> Genres { get; set; }
+        public GenresWrapper Genres { get; set; }
         public String Label { get; set; }
         public int Nb_Tracks { get; set; }
         public int Duration { get; set; }
@@ -37,13 +37,13 @@ namespace Entidades
         public List<Contributor> Contributors { get; set; }
         public Object Fallback {  get; set; }
         public Artist Artist { get; set; }
-        public List<Track> Tracks { get; set; }
+        public TracksWrapper Tracks { get; set; }
         #endregion
 
         #region Constructores 
         public Album() { }
 
-        public Album(long id , string title, string uPC, string link, string share, string cover, string coverSmall, string coverMedium, string coverBig, string coverXL, string mD5Image, int genreId, List<Genre> genres, string label, int nbTracks, int duration, int fans, string releaseDate, string recordType, bool available, Album alternative, string trackList, bool explicitLyrics, int explicitContentLyrics, int explicitContentCover, List<Contributor> contributors, object fallback, Artist artist, List<Track> tracks)
+        public Album(long id , string title, string uPC, string link, string share, string cover, string coverSmall, string coverMedium, string coverBig, string coverXL, string mD5Image, int genreId, GenresWrapper genres, string label, int nbTracks, int duration, int fans, string releaseDate, string recordType, bool available, Album alternative, string trackList, bool explicitLyrics, int explicitContentLyrics, int explicitContentCover, List<Contributor> contributors, object fallback, Artist artist, TracksWrapper tracks)
         {
             Id = id;
             Title = title;

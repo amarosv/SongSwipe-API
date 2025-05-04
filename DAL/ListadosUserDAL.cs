@@ -9,14 +9,8 @@ using System.Windows.Input;
 
 namespace DAL
 {
-    public class ListadosDAL
+    public class ListadosUserDAL
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
-        private const string DeezerApiUrl = "https://api.deezer.com/";
-        private const int MaxRequestsPerWindow = 50;
-        private static DateTime _lastRequestTime = DateTime.MinValue;
-        private static int _requestCount = 0;
-
         /// <summary>
         /// Esta función obtiene todos los usuarios de la base de datos y los devuelve como una lista
         /// </summary>
@@ -154,7 +148,7 @@ namespace DAL
             List<Track> tracks = new List<Track>();
 
             // Primero obtenemos los ids de las canciones de la base de datos
-            var result = getTracksIds("EXEC GetLikedTracks @UID, @page, @limit", uid, page, limit);
+            var result = getListIds("EXEC GetLikedTracks @UID, @page, @limit", uid, page, limit);
 
             // Calcular total de canciones
             int offset = (page - 1) * limit + 1;
@@ -172,16 +166,16 @@ namespace DAL
             List<Task<Track>> trackTasks = new List<Task<Track>>();
 
             // Se añaden las tareas a la lista
-            foreach (long trackId in result.tracks)
+            foreach (long trackId in result.list)
             {
                 // Verificamos si la canción ya está en el cache
-                if (TrackCache.TryGetTrack(trackId, out Track cachedTrack))
+                if (DeezerCache.TryGetTrack(trackId, out Track cachedTrack))
                 {
                     tracks.Add(cachedTrack); // Si está en el cache, lo agregamos directamente
                 }
                 else
                 {
-                    trackTasks.Add(HandleRateLimitAndGetTrack(trackId)); // Si no está, la solicitamos
+                    trackTasks.Add(CallApiDeezer.HandleRateLimitAndGetTrack(trackId)); // Si no está, la solicitamos
                 }
             }
 
@@ -191,7 +185,7 @@ namespace DAL
             // Agregamos los resultados a la lista final y los almacenamos en el cache
             foreach (var track in trackResults.Where(t => t != null))
             {
-                TrackCache.AddTrack(track.Id, track); // Guardamos la canción en el cache
+                DeezerCache.AddTrack(track.Id, track); // Guardamos la canción en el cache
                 tracks.Add(track);
             }
 
@@ -220,7 +214,7 @@ namespace DAL
             List<Track> tracks = new List<Track>();
 
             // Primero obtenemos los ids de las canciones de la base de datos
-            var result = getTracksIds("EXEC GetDisLikedTracks @UID, @page, @limit", uid, page, limit);
+            var result = getListIds("EXEC GetDisLikedTracks @UID, @page, @limit", uid, page, limit);
 
             // Calcular total de canciones
             int offset = (page - 1) * limit + 1;
@@ -238,16 +232,16 @@ namespace DAL
             List<Task<Track>> trackTasks = new List<Task<Track>>();
 
             // Se añaden las tareas a la lista
-            foreach (long trackId in result.tracks)
+            foreach (long trackId in result.list)
             {
                 // Verificamos si la canción ya está en el cache
-                if (TrackCache.TryGetTrack(trackId, out Track cachedTrack))
+                if (DeezerCache.TryGetTrack(trackId, out Track cachedTrack))
                 {
                     tracks.Add(cachedTrack); // Si está en el cache, lo agregamos directamente
                 }
                 else
                 {
-                    trackTasks.Add(HandleRateLimitAndGetTrack(trackId)); // Si no está, la solicitamos
+                    trackTasks.Add(CallApiDeezer.HandleRateLimitAndGetTrack(trackId)); // Si no está, la solicitamos
                 }
             }
 
@@ -257,7 +251,7 @@ namespace DAL
             // Agregamos los resultados a la lista final y los almacenamos en el cache
             foreach (var track in trackResults.Where(t => t != null))
             {
-                TrackCache.AddTrack(track.Id, track); // Guardamos la canción en el cache
+                DeezerCache.AddTrack(track.Id, track); // Guardamos la canción en el cache
                 tracks.Add(track);
             }
 
@@ -581,31 +575,17 @@ namespace DAL
             return usuarios;
         }
 
-        private static async Task<Track> HandleRateLimitAndGetTrack(long trackId)
-        {
-            await HandleRateLimit();
-
-            var response = await _httpClient.GetAsync($"{DeezerApiUrl}/track/{trackId}");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                Track trackData = JsonConvert.DeserializeObject<Track>(content);
-                return trackData;
-            }
-            return null;
-        }
-
         /// <summary>
-        /// Esta función obtiene los ids de las canciones de la base de datos
+        /// Esta función obtiene los ids de las canciones/generos/artistas de la base de datos
         /// y los devuelve como una lista
         /// </summary>
         /// <param name="procedure">Procedure a ejecutar</param>
         /// <param name="uid">UID del usuario</param>
-        /// <returns>Lista de ids de canciones</returns>
-        private static (int totalPages, List<long> tracks) getTracksIds(String procedure, String uid, int page, int limit)
+        /// <returns>Lista de ids de canciones/generos/artistas</returns>
+        private static (int totalPages, List<long> list) getListIds(String procedure, String uid, int page, int limit)
         {
-            // Obtenemos de la DB los ids de las canciones que le han gustado
-            List<long> tracksId = new List<long>();
+            // Obtenemos de la DB los ids de las canciones/generos/artistas que le han gustado
+            List<long> ids = new List<long>();
             int totalPages = 0;
 
             SqlCommand miComando = new SqlCommand();
@@ -632,9 +612,9 @@ namespace DAL
                     {
                         while (miLector.Read())
                         {
-                            long idTrack = (long)miLector["IDTrack"];
+                            long idTrack = (long)miLector["ID"];
 
-                            tracksId.Add(idTrack);
+                            ids.Add(idTrack);
                         }
                     }
                 }
@@ -648,23 +628,141 @@ namespace DAL
                 clsConexion.Desconectar();
             }
 
-            return (totalPages, tracksId);
+            return (totalPages, ids);
         }
 
-        private static async Task HandleRateLimit()
+        /// <summary>
+        /// Esta función recibe el uid de un usuario, obtiene los artistas que sigue
+        /// y los devuelve como una lista
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="page">Número de página</param>
+        /// <param name="limit">Número de artistas por página</param>
+        /// <returns>Objeto con información y lista de artistas</returns>
+        public static async Task<PaginatedArtists> getFavArtistsDAL(String uid, int page, int limit, String baseUrl)
         {
-            if (_requestCount >= MaxRequestsPerWindow)
+            PaginatedArtists paginatedArtists = new PaginatedArtists();
+            List<Artist> artists = new List<Artist>();
+
+            // Primero obtenemos los ids de los artistas de la base de datos
+            var result = getListIds("EXEC GetFavoriteArtists @UID, @page, @limit", uid, page, limit);
+
+            // Calcular total de artistas
+            int offset = (page - 1) * limit + 1;
+
+            if (page > 1)
             {
-                TimeSpan elapsed = DateTime.UtcNow - _lastRequestTime;
-                if (elapsed.TotalSeconds < 5) // Espera si se superó el límite
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(5 - elapsed.TotalSeconds));
-                }
-                _requestCount = 0;
+                paginatedArtists.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
             }
 
-            _lastRequestTime = DateTime.UtcNow;
-            _requestCount++;
+            if (page < result.totalPages)
+            {
+                paginatedArtists.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
+            }
+
+            // Crear una lista de tareas para manejar las peticiones de forma concurrente
+            List<Task<Artist>> artistTasks = new List<Task<Artist>>();
+
+            // Se añaden las tareas a la lista
+            foreach (long artistId in result.list)
+            {
+                // Verificamos si el artista ya está en el cache
+                if (DeezerCache.TryGetArtist(artistId, out Artist cachedArtist))
+                {
+                    artists.Add(cachedArtist); // Si está en el cache, lo agregamos directamente
+                }
+                else
+                {
+                    artistTasks.Add(CallApiDeezer.HandleRateLimitAndGetArtist(artistId)); // Si no está, la solicitamos
+                }
+            }
+
+            // Esperamos que todas las tareas se completen
+            var artistResults = await Task.WhenAll(artistTasks);
+
+            // Agregamos los resultados a la lista final y los almacenamos en el cache
+            foreach (var artist in artistResults.Where(t => t != null))
+            {
+                DeezerCache.AddArtist(artist.Id, artist); // Guardamos el artista en el cache
+                artists.Add(artist);
+            }
+
+            // Asignar valores al objeto paginado
+            paginatedArtists.Page = page;
+            paginatedArtists.TotalPages = result.totalPages;
+            paginatedArtists.Offset = offset;
+            paginatedArtists.Last = offset + artists.Count - 1;
+            paginatedArtists.Limit = limit;
+            paginatedArtists.Artists = artists;
+
+            return paginatedArtists;
+        }
+
+        /// <summary>
+        /// Esta función recibe el uid de un usuario, obtiene los géneros que ha marcado como favorito
+        /// y los devuelve como una lista
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="page">Número de página</param>
+        /// <param name="limit">Número de artistas por página</param>
+        /// <returns>Objeto con información y lista de géneros que ha marcado como favorito</returns>
+        public static async Task<PaginatedGenres> getFavGenresDAL(String uid, int page, int limit, String baseUrl)
+        {
+            PaginatedGenres paginatedGenres = new PaginatedGenres();
+            List<Genre> genres = new List<Genre>();
+
+            // Primero obtenemos los ids de los géneros de la base de datos
+            var result = getListIds("EXEC GetFavoriteGenres @UID, @page, @limit", uid, page, limit);
+
+            // Calcular total de géneros
+            int offset = (page - 1) * limit + 1;
+
+            if (page > 1)
+            {
+                paginatedGenres.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
+            }
+
+            if (page < result.totalPages)
+            {
+                paginatedGenres.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
+            }
+
+            // Crear una lista de tareas para manejar las peticiones de forma concurrente
+            List<Task<Genre>> genreTasks = new List<Task<Genre>>();
+
+            // Se añaden las tareas a la lista
+            foreach (long genreId in result.list)
+            {
+                // Verificamos si el género ya está en el cache
+                if (DeezerCache.TryGetGenre(genreId, out Genre cachedGenre))
+                {
+                    genres.Add(cachedGenre); // Si está en el cache, lo agregamos directamente
+                }
+                else
+                {
+                    genreTasks.Add(CallApiDeezer.HandleRateLimitAndGetGenre(genreId)); // Si no está, la solicitamos
+                }
+            }
+
+            // Esperamos que todas las tareas se completen
+            var genreResults = await Task.WhenAll(genreTasks);
+
+            // Agregamos los resultados a la lista final y los almacenamos en el cache
+            foreach (var genre in genreResults.Where(t => t != null))
+            {
+                DeezerCache.AddGenre(genre.Id, genre); // Guardamos el género en el cache
+                genres.Add(genre);
+            }
+
+            // Asignar valores al objeto paginado
+            paginatedGenres.Page = page;
+            paginatedGenres.TotalPages = result.totalPages;
+            paginatedGenres.Offset = offset;
+            paginatedGenres.Last = offset + genres.Count - 1;
+            paginatedGenres.Limit = limit;
+            paginatedGenres.Genres = genres;
+
+            return paginatedGenres;
         }
     }
 }
