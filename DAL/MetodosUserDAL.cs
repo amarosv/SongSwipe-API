@@ -89,11 +89,12 @@ namespace DAL
                 miComando.Parameters.Add("@email", System.Data.SqlDbType.VarChar).Value = user.Email;
                 miComando.Parameters.Add("@photoUrl", System.Data.SqlDbType.VarChar).Value = user.PhotoURL;
                 miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = user.Username;
+                miComando.Parameters.Add("@supplier", System.Data.SqlDbType.VarChar).Value = user.Supplier;
                 miComando.Parameters.Add("@deleted", System.Data.SqlDbType.Bit).Value = user.UserDeleted;
                 miComando.Parameters.Add("@blocked", System.Data.SqlDbType.Bit).Value = user.UserBlocked;
 
-                miComando.CommandText = "INSERT INTO USERS (UID, Name, LastName, Email, PhotoUrl, Username, UserDeleted, UserBlocked)" +
-                    "VALUES (@uid, @name, @lastName, @email, @photoUrl, @username, @deleted, @blocked)";
+                miComando.CommandText = "INSERT INTO USERS (UID, Name, LastName, Email, PhotoUrl, Username, Supplier, UserDeleted, UserBlocked)" +
+                    "VALUES (@uid, @name, @lastName, @email, @photoUrl, @username, @supplier, @deleted, @blocked)";
 
                 numFilasAfectadas = miComando.ExecuteNonQuery();
             }

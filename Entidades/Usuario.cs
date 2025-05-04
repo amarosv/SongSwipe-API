@@ -12,6 +12,7 @@ namespace Entidades
         private String _photoURL;
         private String _dateJoining;
         private String _username;
+        private String _supplier;
         private bool _userDeleted;
         private bool _userBlocked;
         #endregion
@@ -100,6 +101,18 @@ namespace Entidades
             }
         }
 
+        public String Supplier
+        {
+            get { return _supplier; }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    _supplier = value;
+                }
+            }
+        }
+
         public bool UserDeleted
         {
             get { return _userDeleted; }
@@ -122,7 +135,7 @@ namespace Entidades
         #region Constructores
         public Usuario() { }
 
-        public Usuario(string uid, string name, string lastName, string email, string photoURL, string dateJoining, string username, bool userDeleted, bool userBlocked)
+        public Usuario(string uid, string name, string lastName, string email, string photoURL, string dateJoining, string username, string supplier, bool userDeleted, bool userBlocked)
         {
             if (!string.IsNullOrEmpty(uid))
             {
@@ -153,6 +166,11 @@ namespace Entidades
 
             if (!string.IsNullOrEmpty(username)) { 
                 _username = username;
+            }
+
+            if (!string.IsNullOrEmpty(supplier))
+            {
+                _supplier = supplier;
             }
 
             _userDeleted = userDeleted;
