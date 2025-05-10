@@ -831,7 +831,7 @@ namespace Back.Controllers.API
             return salida;
         }
 
-        // PUT api/<User>/settings/5
+        // PUT api/<User>/5/settings/
         [HttpPut("{uid}/settings")]
         [SwaggerOperation(
             Summary = "Obtiene un UID de usuario, sus ajustes actualizados y lo actualiza en la base de datos",

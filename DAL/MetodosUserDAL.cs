@@ -470,7 +470,7 @@ namespace DAL
 
                 miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
                 miComando.Parameters.Add("@mode", System.Data.SqlDbType.Int).Value = settings.Mode;
-                miComando.Parameters.Add("@theme", System.Data.SqlDbType.Bit).Value = settings.Theme;
+                miComando.Parameters.Add("@theme", System.Data.SqlDbType.Int).Value = settings.Theme;
                 miComando.Parameters.Add("@cardAnimatedCover", System.Data.SqlDbType.Bit).Value = settings.CardAnimatedCover;
                 miComando.Parameters.Add("@cardSkipSongs", System.Data.SqlDbType.Bit).Value = settings.CardSkipSongs;
                 miComando.Parameters.Add("@cardBlurredCoverAsBackground", System.Data.SqlDbType.Bit).Value = settings.CardBlurredCoverAsBackground;
