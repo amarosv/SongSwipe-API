@@ -571,7 +571,7 @@ namespace Back.Controllers.API
             {
                 if (!string.IsNullOrEmpty(username))
                 {
-                    bool exists = MetodosUserDAL.checkUsername(username);
+                    bool exists = MetodosUserDAL.checkUsernameDAL(username);
 
                     salida = Ok(exists);
                 }
@@ -605,7 +605,7 @@ namespace Back.Controllers.API
             {
                 if (!string.IsNullOrEmpty(email))
                 {
-                    bool exists = MetodosUserDAL.checkEmail(email);
+                    bool exists = MetodosUserDAL.checkEmailDAL(email);
 
                     salida = Ok(exists);
                 }
@@ -642,7 +642,7 @@ namespace Back.Controllers.API
 
             try
             {
-                userProfile = MetodosUserDAL.getUserProfileData(uid);
+                userProfile = MetodosUserDAL.getUserProfileDataDAL(uid);
 
                 if (userProfile == null)
                 {
@@ -682,7 +682,7 @@ namespace Back.Controllers.API
 
             try
             {
-                settings = MetodosUserDAL.getUserSettings(uid);
+                settings = MetodosUserDAL.getUserSettingsDAL(uid);
 
                 if (settings == null)
                 {
@@ -782,6 +782,39 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/track_saved/1
+        [HttpGet("{uid}/track_saved/{idTrack}")]
+        [SwaggerOperation(
+            Summary = "Obtiene si el usuario ha guardado la canción como \"Me gusta\" o \"No me gusta\"",
+            Description = "Este método recibe el uid del usuario y el id de na canción y obtiene si el usuario ha guardado la canción como \"Me gusta\" o \"No me gusta\"<br>"
+        )]
+        [SwaggerResponse(200, "Canción guardada o no", typeof(bool))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult IsTrackSaved(
+            [SwaggerParameter(Description = "UID del usuario a obtener los ids de los géneros que sigue")]
+            String uid,
+            [SwaggerParameter(Description = "ID de la canción")]
+            long idTrack
+        )
+        {
+            IActionResult salida;
+            bool saved = false;
+
+            try
+            {
+                saved = MetodosUserDAL.hasUserSavedTrackDAL(uid, idTrack);
+
+                salida = Ok(saved);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>
         [HttpPost]
         [SwaggerOperation(
@@ -798,7 +831,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.createUser(user);
+                numFilasAfectadas = MetodosUserDAL.createUserDAL(user);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound("No se ha podido crear el usuario");
@@ -832,7 +865,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.addArtistsToFavorites(uid, artistas);
+                numFilasAfectadas = MetodosUserDAL.addArtistsToFavoritesDAL(uid, artistas);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
@@ -866,7 +899,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.addGenresToFavorites(uid, generos);
+                numFilasAfectadas = MetodosUserDAL.addGenresToFavoritesDAL(uid, generos);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
@@ -906,7 +939,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.updateUser(user);
+                numFilasAfectadas = MetodosUserDAL.updateUserDAL(user);
 
                 if (numFilasAfectadas == 0)
                 {
@@ -947,7 +980,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.updateUserSettings(settings, uid);
+                numFilasAfectadas = MetodosUserDAL.updateUserSettingsDAL(settings, uid);
 
                 if (numFilasAfectadas == 0)
                 {
@@ -986,7 +1019,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.deleteUser(uid);
+                numFilasAfectadas = MetodosUserDAL.deleteUserDAL(uid);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound("No se ha podido eliminar al usuario");

@@ -76,7 +76,7 @@ namespace DAL
         /// </summary>
         /// <param name="user">Usuario</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int createUser(Usuario user) {
+        public static int createUserDAL(Usuario user) {
             int numFilasAfectadas = 0;
 
             SqlCommand miComando = new SqlCommand();
@@ -116,7 +116,7 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int deleteUser(String uid)
+        public static int deleteUserDAL(String uid)
         {
             int numFilasAfectadas = 0;
 
@@ -149,7 +149,7 @@ namespace DAL
         /// </summary>
         /// <param name="user">Usuario modificado</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int updateUser(Usuario user)
+        public static int updateUserDAL(Usuario user)
         {
             int numFilasAfectadas = 0;
 
@@ -191,7 +191,7 @@ namespace DAL
         /// </summary>
         /// <param name="username">Username a comprobar</param>
         /// <returns>Existe o no</returns>
-        public static bool checkUsername(String username)
+        public static bool checkUsernameDAL(String username)
         {
             bool exists = false;
             SqlCommand miComando = new SqlCommand();
@@ -234,7 +234,7 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="artists">Lista de ids de los artistas</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int addArtistsToFavorites(String uid, List<long> artists)
+        public static int addArtistsToFavoritesDAL(String uid, List<long> artists)
         {
             int numFilasAfectadas = 0;
 
@@ -275,7 +275,7 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="genres">Lista de ids de los géneros</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int addGenresToFavorites(String uid, List<long> genres)
+        public static int addGenresToFavoritesDAL(String uid, List<long> genres)
         {
             int numFilasAfectadas = 0;
 
@@ -318,7 +318,7 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Usuario con los datos a mostrar en el perfil</returns>
-        public static UserProfile getUserProfileData(String uid)
+        public static UserProfile getUserProfileDataDAL(String uid)
         {
             UserProfile userProfile = null;
             String uidUser = "";
@@ -379,7 +379,7 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Ajustes del usuario</returns>
-        public static Settings getUserSettings(String uid) {
+        public static Settings getUserSettingsDAL(String uid) {
             Settings settings = null;
             int mode;
             int theme;
@@ -458,7 +458,7 @@ namespace DAL
         /// <param name="settings">Ajustes modificados</param>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int updateUserSettings(Settings settings, String uid)
+        public static int updateUserSettingsDAL(Settings settings, String uid)
         {
             int numFilasAfectadas = 0;
 
@@ -517,7 +517,7 @@ namespace DAL
         /// </summary>
         /// <param name="email">Email a comprobar</param>
         /// <returns>Existe o no</returns>
-        public static bool checkEmail(String email)
+        public static bool checkEmailDAL(String email)
         {
             bool exists = false;
             SqlCommand miComando = new SqlCommand();
@@ -553,5 +553,47 @@ namespace DAL
             return exists;
         }
 
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y el id de una canción y comprueba si el usuario la tiene guarda
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="idTrack">ID de la canción</param>
+        /// <returns>Booleano que indica si la canción está guardad</returns>
+        public static bool hasUserSavedTrackDAL(String uid, long idTrack)
+        {
+            bool saved = false;
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@idTrack", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@idTrack", System.Data.SqlDbType.BigInt).Value = idTrack;
+                miComando.CommandText = "SELECT 1 AS 'EXISTS' FROM USERSWIPES WHERE UID = @uid AND IDTrack = @idTrack";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        int total = (int)miLector["EXISTS"];
+
+                        saved = total == 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return saved;
+        }
     }
 }
