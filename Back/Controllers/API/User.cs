@@ -709,7 +709,7 @@ namespace Back.Controllers.API
             Description = "Este método obtiene los ids de los artistas que sigue el usuario<br>" +
             "Si no se encuentran artistas, devuelve un mensaje de error"
         )]
-        [SwaggerResponse(200, "Ids de los artistas", typeof(Settings))]
+        [SwaggerResponse(200, "Ids de los artistas", typeof(List<long>))]
         [SwaggerResponse(404, "No se han encontrado artistas")]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult GetUserFavoriteArtistsIds(
