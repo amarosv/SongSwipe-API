@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Link Compress API", Version = "v1.6.1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Link Compress API", Version = "v1.7" });
     options.EnableAnnotations();
 });
 
@@ -24,6 +24,7 @@ app.UseCors(x => x
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
+
 
 app.UseDefaultFiles();
 

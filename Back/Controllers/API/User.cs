@@ -2,6 +2,7 @@
 using DTO;
 using Entidades;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 
@@ -18,7 +19,7 @@ namespace Back.Controllers.API
         [SwaggerOperation(
             Summary = "Obtiene un listado con todos los usuarios activos",
             Description = "Este método obtiene todas los usuarios activos (desbloqueados y no eliminados) y los devuelve como un listado.<br>" +
-            "Si no se encuentra ningun usuario devuelve un mensaje de error."
+            "Si no se encuentra ningun usuario devuelve un mensaje de error."            
         )]
         [SwaggerResponse(200, "Lista de usarios obtenida correctamente", typeof(List<Usuario>))]
         [SwaggerResponse(404, "No se ha encontrado ningún usuario")]
@@ -33,14 +34,17 @@ namespace Back.Controllers.API
             {
                 lista = ListadosUserDAL.getAllUsers();
 
-                if (lista == null || lista.Count == 0) {
+                if (lista == null || lista.Count == 0)
+                {
                     salida = NotFound("No se ha encontrado ningún usuario");
-                } else
+                }
+                else
                 {
                     salida = Ok(lista);
                 }
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
                 salida = BadRequest(ex.Message);
             }
 
@@ -107,14 +111,17 @@ namespace Back.Controllers.API
             {
                 user = MetodosUserDAL.getUserByUIDDAL(uid);
 
-                if (user == null) {
+                if (user == null)
+                {
                     salida = NotFound("No se ha encontrado ningún usuario con ese UID");
-                } else
+                }
+                else
                 {
                     salida = Ok(user);
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 salida = BadRequest(ex.Message);
             }
 
@@ -345,14 +352,16 @@ namespace Back.Controllers.API
 
             PaginatedTracks paginatedTracks;
 
-            if (page == 0) {
+            if (page == 0)
+            {
                 page = 1;
             }
 
             if (limit == 0)
             {
                 limit = 10;
-            } else if (limit > 50)
+            }
+            else if (limit > 50)
             {
                 limit = 50;
             }
@@ -409,7 +418,8 @@ namespace Back.Controllers.API
             if (limit == 0)
             {
                 limit = 10;
-            } else if (limit > 50)
+            }
+            else if (limit > 50)
             {
                 limit = 50;
             }
@@ -623,12 +633,12 @@ namespace Back.Controllers.API
         [SwaggerResponse(404, "No se han encontrado datos")]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult GetUserProfileData(
-            [SwaggerParameter(Description = "UID del usuario a obtener sus datos")] 
+            [SwaggerParameter(Description = "UID del usuario a obtener sus datos")]
             String uid
         )
         {
             IActionResult salida;
-            UserProfile userProfile = null;  
+            UserProfile userProfile = null;
 
             try
             {
@@ -637,12 +647,15 @@ namespace Back.Controllers.API
                 if (userProfile == null)
                 {
                     salida = NotFound("No se han encontrado datos");
-                } else
+                }
+                else
                 {
                     salida = Ok(userProfile);
                 }
-                
-            } catch (Exception e) {
+
+            }
+            catch (Exception e)
+            {
                 salida = BadRequest(e.Message);
             }
 
@@ -656,7 +669,7 @@ namespace Back.Controllers.API
             Description = "Este método obtiene los ajustes de usuario<br>" +
             "Si no se encuentran ajustes, devuelve un mensaje de error"
         )]
-        [SwaggerResponse(200, "Ajustes del usuairo", typeof(Settings))]
+        [SwaggerResponse(200, "Ajustes del usuario", typeof(Settings))]
         [SwaggerResponse(404, "No se han encontrado ajustes")]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult GetUserSettings(
@@ -678,6 +691,46 @@ namespace Back.Controllers.API
                 else
                 {
                     salida = Ok(settings);
+                }
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/artists_ids
+        [HttpGet("{uid}/artists_ids")]
+        [SwaggerOperation(
+            Summary = "Obtiene los ids de los artistas que el usuario sigue",
+            Description = "Este método obtiene los ids de los artistas que sigue el usuario<br>" +
+            "Si no se encuentran artistas, devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Ids de los artistas", typeof(Settings))]
+        [SwaggerResponse(404, "No se han encontrado artistas")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetUserFavoriteArtistsIds(
+            [SwaggerParameter(Description = "UID del usuario a obtener los ids de los artistas que sigue")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<long> artistsIds = null;
+
+            try
+            {
+                artistsIds = ListadosUserDAL.getUserFavoriteArtistsIdsDAL(uid);
+
+                if (artistsIds.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se han encontrado artistas");
+                }
+                else
+                {
+                    salida = Ok(artistsIds);
                 }
 
             }
@@ -824,7 +877,8 @@ namespace Back.Controllers.API
                     salida = Ok(user);
                 }
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 salida = BadRequest(e.Message);
             }
 
@@ -884,7 +938,7 @@ namespace Back.Controllers.API
         [SwaggerResponse(404, "No se ha podido eliminar al usuario")]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult Delete(
-            [SwaggerParameter(Description = "UID del usuario a eliminar")] 
+            [SwaggerParameter(Description = "UID del usuario a eliminar")]
             String uid)
         {
             IActionResult salida;

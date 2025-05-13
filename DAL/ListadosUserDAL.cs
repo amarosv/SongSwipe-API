@@ -778,5 +778,51 @@ namespace DAL
 
             return paginatedGenres;
         }
+
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y devuelve una lista con los ids de los artistas
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de ids de los artistas</returns>
+        public static List<long> getUserFavoriteArtistsIdsDAL(String uid)
+        {
+            List<long> artistsIds = new List<long>();
+            
+            long id = 0;
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@UID", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.CommandText = "SELECT * FROM USERARTISTS WHERE UID = @UID";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                       id = (long)miLector["IDArtist"];
+
+                        if (id > 0)
+                        {
+                            artistsIds.Add(id);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return artistsIds;
+        }
     }
 }
