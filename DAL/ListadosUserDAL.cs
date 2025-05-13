@@ -780,7 +780,7 @@ namespace DAL
         }
 
         /// <summary>
-        /// Esta función recibe el uid de un usuario y devuelve una lista con los ids de los artistas
+        /// Esta función recibe el uid de un usuario y devuelve una lista con los ids de los artistas que sigue al usuario
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de ids de los artistas</returns>
@@ -823,6 +823,52 @@ namespace DAL
             }
 
             return artistsIds;
+        }
+
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y devuelve una lista con los ids de los géneros que sigue el usuario
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de ids de los artistas</returns>
+        public static List<long> getUserFavoriteGenresIdsDAL(String uid)
+        {
+            List<long> genresIds = new List<long>();
+
+            long id = 0;
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@UID", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.CommandText = "SELECT * FROM USERGENRES WHERE UID = @UID";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        id = (long)miLector["IDGenre"];
+
+                        if (id > 0)
+                        {
+                            genresIds.Add(id);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return genresIds;
         }
     }
 }

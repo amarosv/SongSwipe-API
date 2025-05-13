@@ -742,6 +742,46 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/genres_ids
+        [HttpGet("{uid}/genres_ids")]
+        [SwaggerOperation(
+            Summary = "Obtiene los ids de los géneros que el usuario sigue",
+            Description = "Este método obtiene los ids de los géneros que sigue el usuario<br>" +
+            "Si no se encuentran géneros, devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Ids de los géneros", typeof(List<long>))]
+        [SwaggerResponse(404, "No se han encontrado géneros")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetUserFavoriteGenresIds(
+            [SwaggerParameter(Description = "UID del usuario a obtener los ids de los géneros que sigue")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<long> genresIds = null;
+
+            try
+            {
+                genresIds = ListadosUserDAL.getUserFavoriteGenresIdsDAL(uid);
+
+                if (genresIds.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se han encontrado géneros");
+                }
+                else
+                {
+                    salida = Ok(genresIds);
+                }
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>
         [HttpPost]
         [SwaggerOperation(
