@@ -28,6 +28,8 @@ namespace Entidades
         public bool NotiAppUpdate { get; set; }
         public bool NotiAppRecap { get; set; }
         public bool NotiAccountBlocked { get; set; }
+
+        public bool ShowTutorial { get; set; }
         #endregion
 
         #region Constructores
@@ -52,7 +54,8 @@ namespace Entidades
             bool notiFriendsApproved,
             bool notiAppUpdate,
             bool notiAppRecap,
-            bool notiAccountBlocked
+            bool notiAccountBlocked,
+            bool showTutorial
         )
         {
             Mode = mode;
@@ -74,6 +77,7 @@ namespace Entidades
             NotiAppUpdate = notiAppUpdate;
             NotiAppRecap = notiAppRecap;
             NotiAccountBlocked = notiAccountBlocked;
+            ShowTutorial = showTutorial;
         }
         #endregion
     }

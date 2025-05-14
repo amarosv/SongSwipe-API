@@ -409,6 +409,7 @@ namespace DAL
             bool notiAppUpdate;
             bool notiAppRecap;
             bool notiAccountBlocked;
+            bool showTutorial;
 
             SqlCommand miComando = new SqlCommand();
             SqlDataReader miLector;
@@ -444,8 +445,9 @@ namespace DAL
                         notiAppUpdate = (bool)miLector["Noti_App_Update"];
                         notiAppRecap = (bool)miLector["Noti_App_Recap"];
                         notiAccountBlocked = (bool)miLector["Noti_Account_Blocked"];
+                        showTutorial = (bool)miLector["Show_Tutorial"];
 
-                        settings = new Settings(mode, theme, cardAnimatedCover, cardSkipSongs, cardBlurredCoverAsBackground, privacyVisSavedSongs, privacyVisStats, privacyVisFol, privateAccount, language, audioLoop, audioAutoPlay, audioOnlyAudio, notifications, notiFriendsRequest, notiFriendsApproved, notiAppUpdate, notiAppRecap, notiAccountBlocked);
+                        settings = new Settings(mode, theme, cardAnimatedCover, cardSkipSongs, cardBlurredCoverAsBackground, privacyVisSavedSongs, privacyVisStats, privacyVisFol, privateAccount, language, audioLoop, audioAutoPlay, audioOnlyAudio, notifications, notiFriendsRequest, notiFriendsApproved, notiAppUpdate, notiAppRecap, notiAccountBlocked, showTutorial);
                     }
                 }
             }
@@ -497,6 +499,7 @@ namespace DAL
                 miComando.Parameters.Add("@notiAppUpdate", System.Data.SqlDbType.Bit).Value = settings.NotiAppUpdate;
                 miComando.Parameters.Add("@notiAppRecap", System.Data.SqlDbType.Bit).Value = settings.NotiAppRecap;
                 miComando.Parameters.Add("@notiAccountBlocked", System.Data.SqlDbType.Bit).Value = settings.NotiAccountBlocked;
+                miComando.Parameters.Add("@showTutorial", System.Data.SqlDbType.Bit).Value = settings.ShowTutorial;
 
                 miComando.CommandText = "UPDATE USERSETTINGS " +
                     "SET Mode = @mode, Theme = @theme, Card_Animated_Cover = @cardAnimatedCover, Card_Skip_Songs = @cardSkipSongs," +
@@ -504,7 +507,7 @@ namespace DAL
                     "Privacy_Vis_Stats = @privacyVisStats, Privacy_Vis_Fol = @privacyVisFol, Private_Account = @privateAccount, Language = @language," +
                     "Audio_Loop = @audioLoop, Audio_Autoplay = @audioAutoPlay, Audio_Only_Audio = @audioOnlyAudio, Notifications = @notifications," +
                     "Noti_Friends_Request = @notiFriendRequest, Noti_Friends_Approved = @notiFriendApproved, Noti_App_Update = @notiAppUpdate," +
-                    "Noti_App_Recap = @notiAppRecap, Noti_Account_Blocked = @notiAccountBlocked " +
+                    "Noti_App_Recap = @notiAppRecap, Noti_Account_Blocked = @notiAccountBlocked, Show_Tutorial = @showTutorial " +
                     "WHERE UID = @uid";
 
                 numFilasAfectadas = miComando.ExecuteNonQuery();
