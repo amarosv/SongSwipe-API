@@ -44,8 +44,10 @@ namespace DAL
 
                 miLector = miComando.ExecuteReader();
 
-                if (miLector.HasRows) {
-                    while (miLector.Read()) {
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
                         name = (String)miLector["Name"];
                         lastName = (String)miLector["LastName"];
                         email = (String)miLector["Email"];
@@ -76,7 +78,8 @@ namespace DAL
         /// </summary>
         /// <param name="user">Usuario</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int createUserDAL(Usuario user) {
+        public static int createUserDAL(Usuario user)
+        {
             int numFilasAfectadas = 0;
 
             SqlCommand miComando = new SqlCommand();
@@ -103,14 +106,15 @@ namespace DAL
             catch (Exception ex)
             {
                 throw;
-            } finally
+            }
+            finally
             {
                 clsConexion.Desconectar();
             }
 
             return numFilasAfectadas;
         }
-        
+
         /// <summary>
         /// Esta función recibe un UID de usuario y lo elimina de la base de datos si existe
         /// </summary>
@@ -143,7 +147,7 @@ namespace DAL
 
             return numFilasAfectadas;
         }
-    
+
         /// <summary>
         /// Esta función recibe un usuario modificado y lo actualiza en la base de datos
         /// </summary>
@@ -185,7 +189,7 @@ namespace DAL
 
             return numFilasAfectadas;
         }
-    
+
         /// <summary>
         /// Esta función recibe un username y comprueba que no exista en la base de datos
         /// </summary>
@@ -226,7 +230,7 @@ namespace DAL
 
             return exists;
         }
-        
+
         /// <summary>
         /// Esta función recibe el uid de un usuario y la lista con los ids de los artistas a guardar como favoritos y los
         /// guarda en la base de datos
@@ -244,7 +248,8 @@ namespace DAL
             {
                 miComando.Connection = clsConexion.GetConnection();
 
-                foreach (long id in artists) {
+                foreach (long id in artists)
+                {
                     // Crear un nuevo parámetro para cada iteración
                     SqlParameter uidUser = miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar);
                     uidUser.Value = uid;
@@ -258,9 +263,12 @@ namespace DAL
                     numFilasAfectadas += miComando.ExecuteNonQuery();
                 }
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 throw;
-            } finally
+            }
+            finally
             {
                 clsConexion.Desconectar();
             }
@@ -312,7 +320,7 @@ namespace DAL
 
             return numFilasAfectadas;
         }
-        
+
         /// <summary>
         /// Esta función recibe el uid de un usuario y devuelve la información a mostrar en la pantalla de perfil
         /// </summary>
@@ -373,13 +381,14 @@ namespace DAL
 
             return userProfile;
         }
-        
+
         /// <summary>
         /// Esta función recibe el uid de un usuario y devuelve sus ajustes
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Ajustes del usuario</returns>
-        public static Settings getUserSettingsDAL(String uid) {
+        public static Settings getUserSettingsDAL(String uid)
+        {
             Settings settings = null;
             int mode;
             int theme;
@@ -554,34 +563,57 @@ namespace DAL
         }
 
         /// <summary>
-        /// Esta función recibe el uid de un usuario y el id de una canción y comprueba si el usuario la tiene guarda
+        /// Esta función recibe el uid de un usuario y una lista de id de canciones, comprueba cuales el usuario ha guardado
+        /// y devuelve las que no estan guardadas aún
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <param name="idTrack">ID de la canción</param>
-        /// <returns>Booleano que indica si la canción está guardad</returns>
-        public static bool hasUserSavedTrackDAL(String uid, long idTrack)
+        /// <returns>Listas de ids de canciones que no están guardadas</returns>
+        public static List<long> hasUserSavedTrackDAL(string uid, List<long> idsTracks)
         {
-            bool saved = false;
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            List<long> tracksNotSaved = new List<long>();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@idTrack", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@idTrack", System.Data.SqlDbType.BigInt).Value = idTrack;
-                miComando.CommandText = "SELECT 1 AS 'EXISTS' FROM USERSWIPES WHERE UID = @uid AND IDTrack = @idTrack";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
                 {
-                    while (miLector.Read())
-                    {
-                        int total = (int)miLector["EXISTS"];
+                    // Crear parámetros dinámicos
+                    List<string> paramNames = new List<string>();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
 
-                        saved = total == 1;
+                    for (int i = 0; i < idsTracks.Count; i++)
+                    {
+                        string paramName = "@id" + i;
+                        cmd.Parameters.AddWithValue(paramName, idsTracks[i]);
+                        paramNames.Add(paramName);
+                    }
+
+                    cmd.Parameters.AddWithValue("@uid", uid);
+
+                    cmd.CommandText = $@"
+                        SELECT IDTrack 
+                        FROM USERSWIPES 
+                        WHERE UID = @uid AND IDTrack IN ({string.Join(", ", paramNames)})
+                    ";
+
+                    HashSet<long> savedTrackIds = new HashSet<long>();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            savedTrackIds.Add(reader.GetInt64(0));
+                        }
+                    }
+
+                    // Comparar con la lista original
+                    foreach (long id in idsTracks)
+                    {
+                        if (!savedTrackIds.Contains(id))
+                        {
+                            tracksNotSaved.Add(id);
+                        }
                     }
                 }
             }
@@ -593,7 +625,66 @@ namespace DAL
                 clsConexion.Desconectar();
             }
 
-            return saved;
+            return tracksNotSaved;
         }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y una lista de Swipes y los inserta en la base de datos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="swipes">Lista de Swipes</param>
+        /// <returns>Bool que indica si se ha guardado</returns>
+        public static int saveSwipes(string uid, List<Swipe> swipes)
+        {
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                {
+                    // Construimos la parte VALUES del SQL
+                    List<string> valuesClauses = new List<string>();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+
+                    cmd.CommandText = $"INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, Swipe) VALUES ";
+
+                    for (int i = 0; i < swipes.Count; i++)
+                    {
+                        cmd.CommandText += $"('{uid}', {swipes[i].Id}, {swipes[i].IdAlbum}, {swipes[i].Like})";
+                        if (i < swipes.Count - 1)
+                        {
+                            cmd.CommandText += ", ";
+                        }
+
+                        //string uidParam = $"@uid{i}";
+                        //string idTrackParam = $"@idTrack{i}";
+                        //string idAlbumParam = $"@idTrack{i}";
+                        //string swipeParam = $"@swipe{i}";
+
+                        //valuesClauses.Add($"({uidParam}, {idTrackParam}, {idAlbumParam}, {swipeParam})");
+
+                        //cmd.Parameters.AddWithValue(uidParam, uid);
+                        //cmd.Parameters.AddWithValue(idTrackParam, swipes[i].Id);
+                        //cmd.Parameters.AddWithValue(idAlbumParam, swipes[i].IdAlbum);
+                        //cmd.Parameters.AddWithValue(swipeParam, swipes[i].Like);
+                    }
+
+                    //cmd.CommandText = $"INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, Swipe) VALUES {string.Join(", ", valuesClauses)}";
+
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return numFilasAfectadas;
+        }
+
     }
 }

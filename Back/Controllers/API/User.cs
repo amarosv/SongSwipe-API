@@ -782,29 +782,29 @@ namespace Back.Controllers.API
             return salida;
         }
 
-        // GET api/<User>/5/track_saved/1
-        [HttpGet("{uid}/track_saved/{idTrack}")]
+        // POST api/<User>/5/tracks_not_saved
+        [HttpPost("{uid}/tracks_not_saved")]
         [SwaggerOperation(
-            Summary = "Obtiene si el usuario ha guardado la canción como \"Me gusta\" o \"No me gusta\"",
-            Description = "Este método recibe el uid del usuario y el id de na canción y obtiene si el usuario ha guardado la canción como \"Me gusta\" o \"No me gusta\"<br>"
+            Summary = "Devuelve una lista de ids de canciones que no han sido guardadas aún",
+            Description = "Este método recibe el uid del usuario y una lista de ids de canciones y devuelve una lista con los ids de las canciones que no se han guardado aún<br>"
         )]
-        [SwaggerResponse(200, "Canción guardada o no", typeof(bool))]
+        [SwaggerResponse(200, "Canción guardada o no", typeof(List<long>))]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult IsTrackSaved(
             [SwaggerParameter(Description = "UID del usuario a obtener los ids de los géneros que sigue")]
-            String uid,
-            [SwaggerParameter(Description = "ID de la canción")]
-            long idTrack
+            [FromRoute] String uid,
+            [SwaggerParameter(Description = "Lista de ids de canciones")]
+            [FromBody] List<long> idsTracks
         )
         {
             IActionResult salida;
-            bool saved = false;
+            List<long> tracksNotSaved = [];
 
             try
             {
-                saved = MetodosUserDAL.hasUserSavedTrackDAL(uid, idTrack);
+                tracksNotSaved = MetodosUserDAL.hasUserSavedTrackDAL(uid, idsTracks);
 
-                salida = Ok(saved);
+                salida = Ok(tracksNotSaved);
 
             }
             catch (Exception e)
@@ -900,6 +900,40 @@ namespace Back.Controllers.API
             try
             {
                 numFilasAfectadas = MetodosUserDAL.addGenresToFavoritesDAL(uid, generos);
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound(numFilasAfectadas);
+                }
+                else
+                {
+                    salida = Ok(numFilasAfectadas);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // POST api/<User>/5/save_swipes
+        [HttpPost("{uid}/save_swipes")]
+        [SwaggerOperation(
+            Summary = "Obtiene el UID de un usuario y una lista de swipes y los guarda en la base de datos",
+            Description = "Este método obtiene un UID de un usuario y una lista de swipes y lo guarda en la base de datos.<br>" +
+            "Devuelve el número de filas afectadads"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult PostSwipes(String uid, [FromBody] List<Swipe> swipes)
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.saveSwipes(uid, swipes);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
