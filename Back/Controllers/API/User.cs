@@ -782,6 +782,39 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/is_my_friend/6
+        [HttpGet("{uid}/is_my_friend/{friend}")]
+        [SwaggerOperation(
+            Summary = "Obtiene si son amigos",
+            Description = "Este método recibe dos UIDs y comprueba si son amigos"
+        )]
+        [SwaggerResponse(200, "Son o no amigos", typeof(bool))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetIsUserFriend(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "UID del amigo")]
+            String friend
+        )
+        {
+            IActionResult salida;
+            bool isFriend = false;
+
+            try
+            {
+                isFriend = MetodosUserDAL.isMyFriendDAL(uid, friend);
+
+                salida = Ok(isFriend);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>/5/tracks_not_saved
         [HttpPost("{uid}/tracks_not_saved")]
         [SwaggerOperation(

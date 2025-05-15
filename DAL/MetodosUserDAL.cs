@@ -689,5 +689,47 @@ namespace DAL
             return numFilasAfectadas;
         }
 
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y el UID de otro usuario y comprueba si son amigos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="friend">UID del amigo</param>
+        /// <returns>Son amigos o no</returns>
+        public static bool isMyFriendDAL(String uid, String friend) {
+            bool isMyFriend = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
+                miComando.CommandText = "SELECT 1 AS 'FRIEND' FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        int total = (int)miLector["FRIEND"];
+
+                        isMyFriend = total == 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return isMyFriend;
+        }
     }
 }
