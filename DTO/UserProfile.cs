@@ -12,7 +12,7 @@ namespace DTO
         private string _photoUrl;
         private string _dateJoining;
         private string _email;
-        private int _savedSongs;
+        private int _swipes;
         private int _followers;
         private int _following;
         #endregion
@@ -102,14 +102,14 @@ namespace DTO
             }
         }
 
-        public int SavedSongs
+        public int Swipes
         {
-            get { return _savedSongs; }
+            get { return _swipes; }
             set
             {
                 if (value >= 0)
                 {
-                    _savedSongs = value;
+                    _swipes = value;
                 }
             }
         }
@@ -151,7 +151,7 @@ namespace DTO
             PhotoUrl = photoUrl;
             DateJoining = dateJoining;
             Email = email;
-            SavedSongs = savedSongs;
+            Swipes = savedSongs;
             Followers = followers;
             Following = following;
         }
