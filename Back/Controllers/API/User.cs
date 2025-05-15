@@ -848,6 +848,138 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // POST api/<User>/5/send_request
+        [HttpPost("{uid}/send_request")]
+        [SwaggerOperation(
+            Summary = "Envía una solicitud de amistad",
+            Description = "Este método recibe dos UIDs y envía una solicitud de amistad<br>"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult SendRequest(
+            [SwaggerParameter(Description = "UID del usuario emisor")]
+            [FromRoute] String uid,
+            [SwaggerParameter(Description = "UID del usuario receptor")]
+            [FromBody] String uidFriend
+        )
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.sendRequestDAL(uid, uidFriend);
+
+                salida = Ok(numFilasAfectadas);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // POST api/<User>/5/delete_request
+        [HttpPost("{uid}/delete_request")]
+        [SwaggerOperation(
+            Summary = "Elimina una solicitud de amistad",
+            Description = "Este método recibe dos UIDs y elimina una solicitud de amistad<br>"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult DeleteRequest(
+            [SwaggerParameter(Description = "UID del usuario emisor")]
+            [FromRoute] String uid,
+            [SwaggerParameter(Description = "UID del usuario receptor")]
+            [FromBody] String uidFriend
+        )
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.deleteRequestDAL(uid, uidFriend);
+
+                salida = Ok(numFilasAfectadas);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // POST api/<User>/5/accept_request
+        [HttpPost("{uid}/accept_request")]
+        [SwaggerOperation(
+            Summary = "Acepta una solicitud de amistad",
+            Description = "Este método recibe dos UIDs y acepta una solicitud de amistad<br>"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult AcceptRequest(
+            [SwaggerParameter(Description = "UID del usuario emisor")]
+            [FromRoute] String uid,
+            [SwaggerParameter(Description = "UID del usuario receptor")]
+            [FromBody] String uidFriend
+        )
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.acceptRequestDAL(uid, uidFriend);
+
+                salida = Ok(numFilasAfectadas);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // POST api/<User>/5/decline_request
+        [HttpPost("{uid}/decline_request")]
+        [SwaggerOperation(
+            Summary = "Rechazar una solicitud de amistad",
+            Description = "Este método recibe dos UIDs y rechaza una solicitud de amistad<br>"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult DeclineRequest(
+            [SwaggerParameter(Description = "UID del usuario emisor")]
+            [FromRoute] String uid,
+            [SwaggerParameter(Description = "UID del usuario receptor")]
+            [FromBody] String uidFriend
+        )
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.declineRequestDAL(uid, uidFriend);
+
+                salida = Ok(numFilasAfectadas);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>
         [HttpPost]
         [SwaggerOperation(

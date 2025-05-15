@@ -5,6 +5,7 @@ using Entidades;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -730,6 +731,169 @@ namespace DAL
             }
 
             return isMyFriend;
+        }
+            
+        /// <summary>
+        /// Esta función recibe dos UIDs y envía una solicitud de amistad
+        /// </summary>
+        /// <param name="uid">UID del emisor</param>
+        /// <param name="friend">UID del receptor</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int sendRequestDAL(String uid, String friend) {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
+                miComando.CommandText = "INSERT INTO USERFRIENDREQUEST (UIDSender, UIDReceiver) VALUES (@uid, @friend)";
+
+                numFilasAfectadas = miComando.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+
+            return numFilasAfectadas;
+        }
+
+        /// <summary>
+        /// Esta función recibe dos UIDs y elimina una solicitud de amistad
+        /// </summary>
+        /// <param name="uid">UID del emisor</param>
+        /// <param name="friend">UID del receptor</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int deleteRequestDAL(String uid, String friend)
+        {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
+                miComando.CommandText = "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend";
+
+                numFilasAfectadas = miComando.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+
+            return numFilasAfectadas;
+        }
+
+        /// <summary>
+        /// Esta función recibe dos UIDs y acepta una solicitud de amistad
+        /// </summary>
+        /// <param name="uid">UID del emisor</param>
+        /// <param name="friend">UID del receptor</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int acceptRequestDAL(string uid, string friend)
+        {
+            int numFilasAfectadas = 0;
+
+            SqlConnection conexion = clsConexion.GetConnection();
+            SqlTransaction transaccion = null;
+
+            try
+            {
+                // Iniciamos la transacción
+                transaccion = conexion.BeginTransaction();
+
+                SqlCommand insertarAmigo = new SqlCommand(
+                    "INSERT INTO USERFRIENDS (UID, UIDFriend) VALUES (@uid, @friend)",
+                    conexion, transaccion);
+
+                insertarAmigo.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                insertarAmigo.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
+
+                numFilasAfectadas += insertarAmigo.ExecuteNonQuery();
+
+                SqlCommand eliminarSolicitud = new SqlCommand(
+                    "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @friend AND UIDReceiver = @uid",
+                    conexion, transaccion);
+
+                eliminarSolicitud.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                eliminarSolicitud.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
+
+                numFilasAfectadas += eliminarSolicitud.ExecuteNonQuery();
+
+                // Confirmamos la transacción si todo fue bien
+                transaccion.Commit();
+            }
+            catch (Exception)
+            {
+                // Si hay un error, deshacemos la transacción
+                if (transaccion != null)
+                {
+                    transaccion.Rollback();
+                }
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return numFilasAfectadas;
+        }
+
+        /// <summary>
+        /// Esta función recibe dos UIDs y rechaza una solicitud de amistad
+        /// </summary>
+        /// <param name="uid">UID del emisor</param>
+        /// <param name="friend">UID del receptor</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int declineRequestDAL(String uid, String friend)
+        {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
+                miComando.CommandText = "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @friend AND UIDReceiver = @uid";
+
+                numFilasAfectadas = miComando.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+
+            return numFilasAfectadas;
         }
     }
 }
