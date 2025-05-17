@@ -815,6 +815,116 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/request_sent/6
+        [HttpGet("{uid}/request_sent/{friend}")]
+        [SwaggerOperation(
+            Summary = "Obtiene si se le ha mandado una solicitud de amistad",
+            Description = "Este método recibe dos UIDs y comprueba si se le ha mandado la solicitud de amistad"
+        )]
+        [SwaggerResponse(200, "Se ha enviado solicitud", typeof(bool))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetIsRequestSent(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "UID del amigo")]
+            String friend
+        )
+        {
+            IActionResult salida;
+            bool isFriend = false;
+
+            try
+            {
+                isFriend = MetodosUserDAL.requestSentDAL(uid, friend);
+
+                salida = Ok(isFriend);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/list_sent_requests
+        [HttpGet("{uid}/list_sent_requests")]
+        [SwaggerOperation(
+            Summary = "Obtiene una lista de los usuarios a los que les ha mandado una solicitud de amistad",
+            Description = "Este método recibe un UID y devuelve una lista con los usuarios a los que les ha mandado una solicitu de amistad." +
+            "Si no se encuentran solicitudes devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Se ha enviado solicitud", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se han encontrado solicitudes")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetListSentRequests(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<Usuario> usuarios;
+
+            try
+            {
+                usuarios = ListadosUserDAL.getSentRequestDAL(uid);
+
+                if (usuarios.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se han encontrado solicitudes");
+                } else
+                {
+                    salida = Ok(usuarios);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/list_receive_requests
+        [HttpGet("{uid}/list_receive_requests")]
+        [SwaggerOperation(
+            Summary = "Obtiene una lista de los usuarios que le han mandado una solicitud de amistad",
+            Description = "Este método recibe un UID y devuelve una lista con los usuarios que le han mandado una solicitu de amistad." +
+            "Si no se encuentran solicitudes devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Se ha enviado solicitud", typeof(List<Usuario>))]
+        [SwaggerResponse(404, "No se han encontrado solicitudes")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetListReceiveRequests(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<Usuario> usuarios;
+
+            try
+            {
+                usuarios = ListadosUserDAL.getReceiveRequestDAL(uid);
+
+                if (usuarios.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se han encontrado solicitudes");
+                }
+                else
+                {
+                    salida = Ok(usuarios);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>/5/tracks_not_saved
         [HttpPost("{uid}/tracks_not_saved")]
         [SwaggerOperation(

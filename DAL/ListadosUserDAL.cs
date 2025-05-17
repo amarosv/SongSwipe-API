@@ -870,5 +870,133 @@ namespace DAL
 
             return genresIds;
         }
+
+        /// <summary>
+        /// Esta función recibe un UID y devuelve una lista con los usuarios a los que les ha enviado una
+        /// solicitud de amistad
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getSentRequestDAL(String uid)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+            Usuario usuario = new Usuario();
+            String uidUsuario = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String username = "";
+            String dateJoining = "";
+            String photoUrl = "";
+            String supplier = "";
+            bool userDeleted = false;
+            bool userBlocked = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetSentRequests @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUsuario = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        supplier = (String)miLector["Supplier"];
+                        userDeleted = (bool)miLector["UserDeleted"];
+                        userBlocked = (bool)miLector["UserBlocked"];
+
+                        usuario = new Usuario(uidUsuario, name, lastName, email, photoUrl, dateJoining, username, supplier, userDeleted, userBlocked);
+                        usuarios.Add(usuario);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
+
+        /// <summary>
+        /// Esta función recibe un UID y devuelve una lista con los usuarios que le han enviado una
+        /// solicitud de amistad
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getReceiveRequestDAL(String uid)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+            Usuario usuario = new Usuario();
+            String uidUsuario = "";
+            String name = "";
+            String lastName = "";
+            String email = "";
+            String username = "";
+            String dateJoining = "";
+            String photoUrl = "";
+            String supplier = "";
+            bool userDeleted = false;
+            bool userBlocked = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.CommandText = "EXEC GetReceiveRequests @UID";
+                miComando.Parameters.AddWithValue("@UID", uid);
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        uidUsuario = (String)miLector["UID"];
+                        name = (String)miLector["Name"];
+                        lastName = (String)miLector["LastName"];
+                        email = (String)miLector["Email"];
+                        photoUrl = (String)miLector["PhotoUrl"];
+                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
+                        username = (String)miLector["Username"];
+                        supplier = (String)miLector["Supplier"];
+                        userDeleted = (bool)miLector["UserDeleted"];
+                        userBlocked = (bool)miLector["UserBlocked"];
+
+                        usuario = new Usuario(uidUsuario, name, lastName, email, photoUrl, dateJoining, username, supplier, userDeleted, userBlocked);
+                        usuarios.Add(usuario);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return usuarios;
+        }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -742,6 +743,9 @@ namespace DAL
         public static int sendRequestDAL(String uid, String friend) {
             int numFilasAfectadas = 0;
 
+            // Primero obtenemos si la cuenta a enviar la solicitud es pública
+            Settings settings = getUserSettingsDAL(friend);
+
             SqlCommand miComando = new SqlCommand();
             SqlDataReader miLector;
 
@@ -751,8 +755,13 @@ namespace DAL
 
                 miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
                 miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
-                miComando.CommandText = "INSERT INTO USERFRIENDREQUEST (UIDSender, UIDReceiver) VALUES (@uid, @friend)";
 
+                if (settings != null && !settings.PrivateAccount) {
+                    miComando.CommandText = "INSERT INTO USERFRIENDS (UID, UIDFriend) VALUES (@uid, @friend)";
+                } else {
+                    miComando.CommandText = "INSERT INTO USERFRIENDREQUEST (UIDSender, UIDReceiver) VALUES (@uid, @friend)";
+                }
+                
                 numFilasAfectadas = miComando.ExecuteNonQuery();
             }
             catch (Exception ex)
@@ -894,6 +903,50 @@ namespace DAL
 
 
             return numFilasAfectadas;
+        }
+    
+        /// <summary>
+        /// Esta función recibe dos UIDs y comprueba si ya se le ha enviado una solicitud de amistad
+        /// </summary>
+        /// <param name="uid">UID del emisor</param>
+        /// <param name="friend">UID del receptor</param>
+        /// <returns>Solicitud enviada o no</returns>
+        public static bool requestSentDAL(String uid, String friend)
+        {
+            bool sent = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
+                miComando.CommandText = "SELECT 1 AS 'SENT' FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        int total = (int)miLector["SENT"];
+
+                        sent = total == 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return sent;
         }
     }
 }
