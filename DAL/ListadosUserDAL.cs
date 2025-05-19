@@ -899,7 +899,7 @@ namespace DAL
             {
                 miComando.Connection = clsConexion.GetConnection();
 
-                miComando.CommandText = "EXEC GetSentRequests @UID";
+                miComando.CommandText = "EXEC GetOutgoingFriendRequests @UID";
                 miComando.Parameters.AddWithValue("@UID", uid);
                 miLector = miComando.ExecuteReader();
 
@@ -963,7 +963,7 @@ namespace DAL
             {
                 miComando.Connection = clsConexion.GetConnection();
 
-                miComando.CommandText = "EXEC GetReceiveRequests @UID";
+                miComando.CommandText = "EXEC GetIncomingFriendRequests @UID";
                 miComando.Parameters.AddWithValue("@UID", uid);
                 miLector = miComando.ExecuteReader();
 

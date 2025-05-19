@@ -652,11 +652,11 @@ namespace DAL
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = conn;
 
-                    cmd.CommandText = $"INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, Swipe) VALUES ";
+                    cmd.CommandText = $"INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, IDArtist, Swipe) VALUES ";
 
                     for (int i = 0; i < swipes.Count; i++)
                     {
-                        cmd.CommandText += $"('{uid}', {swipes[i].Id}, {swipes[i].IdAlbum}, {swipes[i].Like})";
+                        cmd.CommandText += $"('{uid}', {swipes[i].Id}, {swipes[i].IdAlbum}, {swipes[i].IdArtist}, {swipes[i].Like})";
                         if (i < swipes.Count - 1)
                         {
                             cmd.CommandText += ", ";
