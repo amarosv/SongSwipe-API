@@ -841,7 +841,7 @@ namespace DAL
                 numFilasAfectadas += insertarAmigo.ExecuteNonQuery();
 
                 SqlCommand eliminarSolicitud = new SqlCommand(
-                    "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @friend AND UIDReceiver = @uid",
+                    "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend",
                     conexion, transaccion);
 
                 eliminarSolicitud.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
