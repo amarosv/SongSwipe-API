@@ -1099,7 +1099,10 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult Post([FromBody] Usuario user)
+        public IActionResult Post(
+            [SwaggerParameter(Description = "Datos del usuario")]
+            [FromBody] Usuario user
+        )
         {
             IActionResult salida;
             int numFilasAfectadas = 0;
@@ -1133,7 +1136,11 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult PostArtistas(String uid, [FromBody] List<long> artistas)
+        public IActionResult PostArtistas(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "Lista de ids de artistas")]
+            [FromBody] List<long> artistas)
         {
             IActionResult salida;
             int numFilasAfectadas = 0;
@@ -1167,7 +1174,11 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult PostGeneros(String uid, [FromBody] List<long> generos)
+        public IActionResult PostGeneros(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "Lista de ids de géneros")]
+            [FromBody] List<long> generos)
         {
             IActionResult salida;
             int numFilasAfectadas = 0;
@@ -1201,14 +1212,56 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult PostSwipes(String uid, [FromBody] List<Swipe> swipes)
+        public IActionResult PostSwipes(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "Lista de Swipes")]
+            [FromBody] List<Swipe> swipes)
         {
             IActionResult salida;
             int numFilasAfectadas = 0;
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.saveSwipes(uid, swipes);
+                numFilasAfectadas = MetodosUserDAL.saveSwipesDAL(uid, swipes);
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound(numFilasAfectadas);
+                }
+                else
+                {
+                    salida = Ok(numFilasAfectadas);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // POST api/<User>/5/delete_friend
+        [HttpPost("{uid}/delete_friend")]
+        [SwaggerOperation(
+            Summary = "Obtiene el UID de un usuario y el uid de su amigo y lo elimina",
+            Description = "Este método obtiene un UID de un usuario y el uid de su amigo y lo elimina<br>" +
+            "Devuelve el número de filas afectadads"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult PostDeleteFriend(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "UID del amigo")]
+            [FromBody] String uidFriend)
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.deleteFriendDAL(uid, uidFriend);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
@@ -1240,7 +1293,8 @@ namespace Back.Controllers.API
             [SwaggerParameter(Description = "UID del usuario a actualizar")]
             String uid,
             [SwaggerParameter(Description = "Usuario actualizado")]
-            [FromBody] Usuario user)
+            [FromBody] Usuario user
+        )
         {
             IActionResult salida;
 
@@ -1321,7 +1375,8 @@ namespace Back.Controllers.API
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult Delete(
             [SwaggerParameter(Description = "UID del usuario a eliminar")]
-            String uid)
+            String uid
+        )
         {
             IActionResult salida;
             int numFilasAfectadas = 0;

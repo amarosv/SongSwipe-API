@@ -639,7 +639,7 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="swipes">Lista de Swipes</param>
         /// <returns>Bool que indica si se ha guardado</returns>
-        public static int saveSwipes(string uid, List<Swipe> swipes)
+        public static int saveSwipesDAL(string uid, List<Swipe> swipes)
         {
             int numFilasAfectadas = 0;
 
@@ -947,6 +947,39 @@ namespace DAL
             }
 
             return sent;
+        }
+
+        /// <summary>
+        /// Esta función recibe dos UIDs y elimina al amigo
+        /// </summary>
+        /// <param name="uid">UID del emisor</param>
+        /// <param name="friend">UID del receptor</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int deleteFriendDAL(String uid, String friend) {
+            int numFilasAfectadas = 0;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
+                miComando.CommandText = "DELETE FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
+
+                numFilasAfectadas = miComando.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return numFilasAfectadas;
         }
     }
 }
