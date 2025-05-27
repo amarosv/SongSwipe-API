@@ -740,6 +740,50 @@ namespace DAL
 
             return isMyFriend;
         }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y el UID de otro usuario y comprueba si lo sigue
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="friend">UID del seguido</param>
+        /// <returns>Lo sigue o no</returns>
+        public static bool followingDAL(String uid, String uidUser)
+        {
+            bool following = false;
+
+            SqlCommand miComando = new SqlCommand();
+            SqlDataReader miLector;
+
+            try
+            {
+                miComando.Connection = clsConexion.GetConnection();
+
+                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
+                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = uidUser;
+                miComando.CommandText = "SELECT 1 AS 'FRIEND' FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
+
+                miLector = miComando.ExecuteReader();
+
+                if (miLector.HasRows)
+                {
+                    while (miLector.Read())
+                    {
+                        int total = (int)miLector["FRIEND"];
+
+                        following = total == 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                clsConexion.Desconectar();
+            }
+
+            return following;
+        }
             
         /// <summary>
         /// Esta función recibe dos UIDs y envía una solicitud de amistad

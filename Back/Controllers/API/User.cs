@@ -815,6 +815,39 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/following/6
+        [HttpGet("{uid}/following/{followed}")]
+        [SwaggerOperation(
+            Summary = "Obtiene si lo sigue",
+            Description = "Este método recibe dos UIDs y comprueba si los igue"
+        )]
+        [SwaggerResponse(200, "Son o no amigos", typeof(bool))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetIsFollowing(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "UID del seguido")]
+            String followed
+        )
+        {
+            IActionResult salida;
+            bool following = false;
+
+            try
+            {
+                following = MetodosUserDAL.followingDAL(uid, followed);
+
+                salida = Ok(following);
+
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // GET api/<User>/5/request_sent/6
         [HttpGet("{uid}/request_sent/{friend}")]
         [SwaggerOperation(
