@@ -709,7 +709,14 @@ namespace DAL
 
                 miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
                 miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
-                miComando.CommandText = "SELECT 1 AS 'FRIEND' FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
+                miComando.CommandText = "WITH FriendsCheck AS (" +
+                    "SELECT 1 AS FRIEND FROM USERFRIENDS WHERE" +
+                    "(UID = @uid AND UIDFriend = @friend)" +
+                    "OR" +
+                    "(UID = @friend AND UIDFriend = @uid)" +
+                    ")" +
+                    "SELECT * FROM FriendsCheck WHERE (SELECT COUNT(*) FROM FriendsCheck) = 2";
+
 
                 miLector = miComando.ExecuteReader();
 
