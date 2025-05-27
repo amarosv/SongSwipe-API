@@ -43,32 +43,27 @@ namespace DAL
         {
             int likes = 0;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetLikesTrack @IDTrack";
-                miComando.Parameters.AddWithValue("@IDTrack", idTrack);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
+                    cmd.CommandText = "EXEC GetLikesTrack @IDTrack";
+                    cmd.Parameters.AddWithValue("@IDTrack", idTrack);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        likes = (int)miLector["LIKES"];
+                        if (reader.Read())
+                        {
+                            likes = (int)reader["LIKES"];
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return likes;
@@ -83,35 +78,31 @@ namespace DAL
         {
             int dislikes = 0;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetDislikesTrack @IDTrack";
-                miComando.Parameters.AddWithValue("@IDTrack", idTrack);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
+                    cmd.CommandText = "EXEC GetDislikesTrack @IDTrack";
+                    cmd.Parameters.AddWithValue("@IDTrack", idTrack);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        dislikes = (int)miLector["DISLIKES"];
+                        if (reader.Read())
+                        {
+                            dislikes = (int)reader["DISLIKES"];
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return dislikes;
         }
+
     }
 }

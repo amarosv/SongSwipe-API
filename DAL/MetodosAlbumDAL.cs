@@ -18,20 +18,14 @@ namespace DAL
         /// <returns>Datos del album</returns>
         public static async Task<Album> getAlbumById(int id)
         {
-            Album album = null;
-
-            // Verificamos si el album ya está en el cache
             if (DeezerCache.TryGetAlbum(id, out Album cachedAlbum))
             {
-                album = cachedAlbum;
-            }
-            else
-            {
-                album = await CallApiDeezer.HandleRateLimitAndGetAlbum(id);
+                return cachedAlbum;
             }
 
-            return album;
+            return await CallApiDeezer.HandleRateLimitAndGetAlbum(id);
         }
+
 
         /// <summary>
         /// Esta función recibe el id de un álbum y devuelve el número de likes de este
@@ -42,36 +36,32 @@ namespace DAL
         {
             int likes = 0;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetLikesAlbum @IDAlbum";
-                miComando.Parameters.AddWithValue("@IDAlbum", idAlbum);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
+                    cmd.CommandText = "EXEC GetLikesAlbum @IDAlbum";
+                    cmd.Parameters.AddWithValue("@IDAlbum", idAlbum);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        likes = (int)miLector["LIKES"];
+                        if (reader.Read())
+                        {
+                            likes = (int)reader["LIKES"];
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return likes;
         }
+
 
         /// <summary>
         /// Esta función recibe el id de un álbum y devuelve el número de dislikes de este
@@ -82,35 +72,31 @@ namespace DAL
         {
             int dislikes = 0;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetDislikesAlbum @IDAlbum";
-                miComando.Parameters.AddWithValue("@IDAlbum", idAlbum);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
+                    cmd.CommandText = "EXEC GetDislikesAlbum @IDAlbum";
+                    cmd.Parameters.AddWithValue("@IDAlbum", idAlbum);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        dislikes = (int)miLector["DISLIKES"];
+                        if (reader.Read())
+                        {
+                            dislikes = (int)reader["DISLIKES"];
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return dislikes;
         }
+
     }
 }

@@ -5,6 +5,7 @@ using Entidades;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Data;
 using System.Windows.Input;
 
 namespace DAL
@@ -19,55 +20,37 @@ namespace DAL
         {
             List<Usuario> usuarios = new List<Usuario>();
 
-            Usuario user = null;
-            String uid = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "SELECT * FROM USERS WHERE UserDeleted = 0 AND UserBlocked = 0";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uid = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "SELECT * FROM USERS WHERE UserDeleted = 0 AND UserBlocked = 0";
 
-                        user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
-                        usuarios.Add(user);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string uid = (string)reader["UID"];
+                            string name = (string)reader["Name"];
+                            string lastName = (string)reader["LastName"];
+                            string email = (string)reader["Email"];
+                            string photoUrl = (string)reader["PhotoUrl"];
+                            string dateJoining = ((DateTime)reader["DateJoining"]).ToString();
+                            string username = (string)reader["Username"];
+                            string supplier = (string)reader["Supplier"];
+                            bool deleted = (bool)reader["UserDeleted"];
+                            bool blocked = (bool)reader["UserBlocked"];
+
+                            usuarios.Add(new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return usuarios;
@@ -79,60 +62,42 @@ namespace DAL
         /// </summary>
         /// <param name="username">Username a buscar</param>
         /// <returns>Lista</returns>
-        public static List<Usuario> getUsersByUsername(String username)
+        public static List<Usuario> getUsersByUsername(string username)
         {
             List<Usuario> usuarios = new List<Usuario>();
 
-            Usuario user = null;
-            String uid = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String usernameUser = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = "%" + username + "%";
-                miComando.CommandText = "SELECT * FROM USERS WHERE Username LIKE @username AND UserDeleted = 0 AND UserBlocked = 0";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uid = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        usernameUser = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "SELECT * FROM USERS WHERE Username LIKE @username AND UserDeleted = 0 AND UserBlocked = 0";
+                    cmd.Parameters.Add("@username", SqlDbType.VarChar).Value = "%" + username + "%";
 
-                        user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, usernameUser, supplier, deleted, blocked);
-                        usuarios.Add(user);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string uid = (string)reader["UID"];
+                            string name = (string)reader["Name"];
+                            string lastName = (string)reader["LastName"];
+                            string email = (string)reader["Email"];
+                            string photoUrl = (string)reader["PhotoUrl"];
+                            string dateJoining = ((DateTime)reader["DateJoining"]).ToString();
+                            string usernameUser = (string)reader["Username"];
+                            string supplier = (string)reader["Supplier"];
+                            bool deleted = (bool)reader["UserDeleted"];
+                            bool blocked = (bool)reader["UserBlocked"];
+
+                            usuarios.Add(new Usuario(uid, name, lastName, email, photoUrl, dateJoining, usernameUser, supplier, deleted, blocked));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return usuarios;
@@ -275,122 +240,66 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de usuarios</returns>
-        public static List<Usuario> getFriendsDAL(String uid)
+        public static List<Usuario> getFriendsDAL(string uid)
         {
-            List<Usuario> usuarios = new List<Usuario>();
-            Usuario user = null;
-            String uidUser = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            var usuarios = new List<Usuario>();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetUserFriends @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uidUser = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "EXEC GetUserFriends @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
 
-                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
-                        usuarios.Add(user);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Methods.mapUsuarioFromReader(reader));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return usuarios;
         }
-        
+
         /// <summary>
         /// Esta función recibe el uid de un usuario, busca las solicitudes de amistad que le han llegado y las devuelve como una lista
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de usuarios</returns>
-        public static List<Usuario> getIncomingFriendRequestsDAL(String uid)
+        public static List<Usuario> getIncomingFriendRequestsDAL(string uid)
         {
-            List<Usuario> usuarios = new List<Usuario>();
-            Usuario user = null;
-            String uidUser = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            var usuarios = new List<Usuario>();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetIncomingFriendRequests @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uidUser = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "EXEC GetIncomingFriendRequests @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
 
-                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
-                        usuarios.Add(user);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Methods.mapUsuarioFromReader(reader));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return usuarios;
@@ -401,59 +310,31 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de usuarios</returns>
-        public static List<Usuario> getOutgoingFriendRequestsDAL(String uid)
+        public static List<Usuario> getOutgoingFriendRequestsDAL(string uid)
         {
-            List<Usuario> usuarios = new List<Usuario>();
-            Usuario user = null;
-            String uidUser = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            var usuarios = new List<Usuario>();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetOutgoingFriendRequests @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uidUser = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "EXEC GetOutgoingFriendRequests @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
 
-                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
-                        usuarios.Add(user);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Methods.mapUsuarioFromReader(reader));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return usuarios;
@@ -466,60 +347,32 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="trackId">ID de la canción</param>
         /// <returns>Lista de usuarios</returns>
-        public static List<Usuario> getFriendsWhoLikedTrackDAL(String uid, long trackId)
+        public static List<Usuario> getFriendsWhoLikedTrackDAL(string uid, long trackId)
         {
-            List<Usuario> usuarios = new List<Usuario>();
-            Usuario user = null;
-            String uidUser = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            List<Usuario> usuarios = new();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetFriendsWhoLikedTrack @UID, @IDTrack";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miComando.Parameters.AddWithValue("@IDTrack", trackId);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uidUser = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "EXEC GetFriendsWhoLikedTrack @UID, @IDTrack";
+                    cmd.Parameters.AddWithValue("@UID", uid);
+                    cmd.Parameters.AddWithValue("@IDTrack", trackId);
 
-                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
-                        usuarios.Add(user);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Methods.mapUsuarioFromReader(reader));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return usuarios;
@@ -531,59 +384,31 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de usuarios</returns>
-        public static List<Usuario> getUsersBlockedDAL(String uid)
+        public static List<Usuario> getUsersBlockedDAL(string uid)
         {
-            List<Usuario> usuarios = new List<Usuario>();
-            Usuario user = null;
-            String uidUser = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            List<Usuario> usuarios = new();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetBlockedUsers @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uidUser = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "EXEC GetBlockedUsers @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
 
-                        user = new Usuario(uidUser, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
-                        usuarios.Add(user);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Methods.mapUsuarioFromReader(reader));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return usuarios;
@@ -596,50 +421,42 @@ namespace DAL
         /// <param name="procedure">Procedure a ejecutar</param>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de ids de canciones/generos/artistas</returns>
-        private static (int totalPages, List<long> list) getListIds(String procedure, String uid, int page, int limit)
+        private static (int totalPages, List<long> list) getListIds(string procedure, string uid, int page, int limit)
         {
-            // Obtenemos de la DB los ids de las canciones/generos/artistas que le han gustado
-            List<long> ids = new List<long>();
+            List<long> ids = new();
             int totalPages = 0;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = procedure;
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miComando.Parameters.AddWithValue("@page", page);
-                miComando.Parameters.AddWithValue("@limit", limit);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    if (miLector.Read())
-                    {
-                        totalPages = miLector.GetInt32(0);
-                    }
+                    cmd.CommandText = procedure;
+                    cmd.Parameters.AddWithValue("@UID", uid);
+                    cmd.Parameters.AddWithValue("@page", page);
+                    cmd.Parameters.AddWithValue("@limit", limit);
 
-                    if (miLector.NextResult())
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        while (miLector.Read())
+                        if (reader.Read())
                         {
-                            long idTrack = (long)miLector["ID"];
+                            totalPages = reader.GetInt32(0);
+                        }
 
-                            ids.Add(idTrack);
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                ids.Add((long)reader["ID"]);
+                            }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return (totalPages, ids);
@@ -784,42 +601,35 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de ids de los artistas</returns>
-        public static List<long> getUserFavoriteArtistsIdsDAL(String uid)
+        public static List<long> getUserFavoriteArtistsIdsDAL(string uid)
         {
-            List<long> artistsIds = new List<long>();
-            
-            long id = 0;
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            List<long> artistsIds = new();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@UID", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.CommandText = "SELECT * FROM USERARTISTS WHERE UID = @UID";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                       id = (long)miLector["IDArtist"];
+                    cmd.CommandText = "SELECT IDArtist FROM USERARTISTS WHERE UID = @UID";
+                    cmd.Parameters.Add("@UID", SqlDbType.VarChar).Value = uid;
 
-                        if (id > 0)
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            artistsIds.Add(id);
+                            long id = (long)reader["IDArtist"];
+                            if (id > 0)
+                            {
+                                artistsIds.Add(id);
+                            }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return artistsIds;
@@ -830,42 +640,33 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de ids de los artistas</returns>
-        public static List<long> getUserFavoriteGenresIdsDAL(String uid)
+        public static List<long> getUserFavoriteGenresIdsDAL(string uid)
         {
-            List<long> genresIds = new List<long>();
-
-            long id = 0;
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            List<long> genresIds = new();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@UID", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.CommandText = "SELECT * FROM USERGENRES WHERE UID = @UID";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        id = (long)miLector["IDGenre"];
+                    cmd.CommandText = "SELECT IDGenre FROM USERGENRES WHERE UID = @UID";
+                    cmd.Parameters.Add("@UID", SqlDbType.VarChar).Value = uid;
 
-                        if (id > 0)
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            genresIds.Add(id);
+                            long id = (long)reader["IDGenre"];
+                            if (id > 0)
+                                genresIds.Add(id);
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return genresIds;
@@ -877,63 +678,36 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de usuarios</returns>
-        public static List<Usuario> getSentRequestDAL(String uid)
+        public static List<Usuario> getSentRequestDAL(string uid)
         {
-            List<Usuario> usuarios = new List<Usuario>();
-            Usuario usuario = new Usuario();
-            String uidUsuario = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String username = "";
-            String dateJoining = "";
-            String photoUrl = "";
-            String supplier = "";
-            bool userDeleted = false;
-            bool userBlocked = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            List<Usuario> usuarios = new();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetOutgoingFriendRequests @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uidUsuario = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        userDeleted = (bool)miLector["UserDeleted"];
-                        userBlocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "EXEC GetOutgoingFriendRequests @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
 
-                        usuario = new Usuario(uidUsuario, name, lastName, email, photoUrl, dateJoining, username, supplier, userDeleted, userBlocked);
-                        usuarios.Add(usuario);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Methods.mapUsuarioFromReader(reader));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return usuarios;
         }
+
 
         /// <summary>
         /// Esta función recibe un UID y devuelve una lista con los usuarios que le han enviado una
@@ -941,62 +715,35 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de usuarios</returns>
-        public static List<Usuario> getReceiveRequestDAL(String uid)
+        public static List<Usuario> getReceiveRequestDAL(string uid)
         {
-            List<Usuario> usuarios = new List<Usuario>();
-            Usuario usuario = new Usuario();
-            String uidUsuario = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String username = "";
-            String dateJoining = "";
-            String photoUrl = "";
-            String supplier = "";
-            bool userDeleted = false;
-            bool userBlocked = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
+            List<Usuario> usuarios = new();
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetIncomingFriendRequests @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        uidUsuario = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        userDeleted = (bool)miLector["UserDeleted"];
-                        userBlocked = (bool)miLector["UserBlocked"];
+                    cmd.CommandText = "EXEC GetIncomingFriendRequests @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
 
-                        usuario = new Usuario(uidUsuario, name, lastName, email, photoUrl, dateJoining, username, supplier, userDeleted, userBlocked);
-                        usuarios.Add(usuario);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Methods.mapUsuarioFromReader(reader));
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return usuarios;
         }
+
     }
 }
