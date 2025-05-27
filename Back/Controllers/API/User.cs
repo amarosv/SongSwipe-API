@@ -1,4 +1,5 @@
-﻿using DAL;
+﻿using DAL.Lists;
+using DAL.Methods;
 using DTO;
 using Entidades;
 using Microsoft.AspNetCore.Mvc;
@@ -370,7 +371,7 @@ namespace Back.Controllers.API
 
             try
             {
-                paginatedTracks = await ListadosUserDAL.getLikedTracksDAL(uid, page, limit, baseUrl);
+                paginatedTracks = await ListadosUserTrackDAL.getLikedTracksDAL(uid, page, limit, baseUrl);
                 if (paginatedTracks.Tracks.Count == 0)
                 {
                     salida = NotFound("No se ha encontrado ninguna canción");
@@ -428,7 +429,7 @@ namespace Back.Controllers.API
 
             try
             {
-                paginatedTracks = await ListadosUserDAL.getDisLikedTracksDAL(uid, page, limit, baseUrl);
+                paginatedTracks = await ListadosUserTrackDAL.getDisLikedTracksDAL(uid, page, limit, baseUrl);
                 if (paginatedTracks.Tracks.Count == 0)
                 {
                     salida = NotFound("No se ha encontrado ninguna canción");
@@ -445,6 +446,266 @@ namespace Back.Controllers.API
 
             return salida;
         }
+
+        // GET api/<User>/5/last_swipes
+        [HttpGet("{uid}/last_swipes")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con los últimos 5 swipes del usuario",
+            Description = "Este método obtiene los últimos 5 swipes del usuario y las devuelve como un listado.<br>" +
+            "Si no se encuentra ninguna canción devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de canciones obtenida correctamente", typeof(List<Entidades.Track>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetLast5Swipes(
+            [SwaggerParameter(Description = "UID del usuario.")]
+            String uid)
+        {
+            IActionResult salida;
+            List<Entidades.Track> tracks;
+
+            try
+            {
+                tracks = await ListadosUserTrackDAL.getLast5SwipesDAL(uid);
+                if (tracks.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ninguna canción");
+                }
+                else
+                {
+                    salida = Ok(tracks);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/top_liked_artists
+        [HttpGet("{uid}/top_liked_artists")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 artistas con más me gustas del usuario",
+            Description = "Este método obtiene el top 10 artistas con más me gustas del usuario y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de artistas obtenida correctamente", typeof(List<Entidades.Artist>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10LikedArtistsByUser(
+            [SwaggerParameter(Description = "UID del usuario.")]
+            String uid)
+        {
+            IActionResult salida;
+            List<Entidades.Artist> artists;
+
+            try
+            {
+                artists = await ListadosUserArtistDAL.getTop10LikedArtistsByUserDAL(uid);
+                if (artists.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún artista");
+                }
+                else
+                {
+                    salida = Ok(artists);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/top_disliked_artists
+        [HttpGet("{uid}/top_disliked_artists")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 artistas con más no me gustas del usuario",
+            Description = "Este método obtiene el top 10 artistas con más no me gustas del usuario y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de artistas obtenida correctamente", typeof(List<Entidades.Artist>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10DislikedArtistsByUser(
+            [SwaggerParameter(Description = "UID del usuario.")]
+            String uid)
+        {
+            IActionResult salida;
+            List<Entidades.Artist> artists;
+
+            try
+            {
+                artists = await ListadosUserArtistDAL.getTop10DislikedArtistsByUserDAL(uid);
+                if (artists.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún artista");
+                }
+                else
+                {
+                    salida = Ok(artists);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/top_swipes_artists
+        [HttpGet("{uid}/top_swipes_artists")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 artistas con más swipes del usuario",
+            Description = "Este método obtiene el top 10 artistas con más swipes del usuario y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de artistas obtenida correctamente", typeof(List<Entidades.Artist>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10SwipesArtistsByUser(
+            [SwaggerParameter(Description = "UID del usuario.")]
+            String uid)
+        {
+            IActionResult salida;
+            List<Entidades.Artist> artists;
+
+            try
+            {
+                artists = await ListadosUserArtistDAL.getTop10SwipesArtistsByUserDAL(uid);
+                if (artists.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún artista");
+                }
+                else
+                {
+                    salida = Ok(artists);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/top_liked_albums
+        [HttpGet("{uid}/top_liked_albums")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 albumes con más me gustas del usuario",
+            Description = "Este método obtiene el top 10 albumes con más me gustas del usuario y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de albumes obtenida correctamente", typeof(List<Entidades.Album>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna álbum")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10LikedAlbumsByUser(
+            [SwaggerParameter(Description = "UID del usuario.")]
+            String uid)
+        {
+            IActionResult salida;
+            List<Entidades.Album> albums;
+
+            try
+            {
+                albums = await ListadosUserAlbumDAL.getTop10LikedAlbumsByUserDAL(uid);
+                if (albums.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún álbum");
+                }
+                else
+                {
+                    salida = Ok(albums);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/top_disliked_albums
+        [HttpGet("{uid}/top_disliked_albums")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 albumes con más no me gustas del usuario",
+            Description = "Este método obtiene el top 10 albumes con más no me gustas del usuario y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de albumes obtenida correctamente", typeof(List<Entidades.Album>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna álbum")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10DislikedAlbumsByUser(
+            [SwaggerParameter(Description = "UID del usuario.")]
+            String uid)
+        {
+            IActionResult salida;
+            List<Entidades.Album> albums;
+
+            try
+            {
+                albums = await ListadosUserAlbumDAL.getTop10DislikedAlbumsByUserDAL(uid);
+                if (albums.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún álbum");
+                }
+                else
+                {
+                    salida = Ok(albums);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/top_swipes_albums
+        [HttpGet("{uid}/top_swipes_albums")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 albumes con más swipes del usuario",
+            Description = "Este método obtiene el top 10 albumes con más swipes del usuario y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de albumes obtenida correctamente", typeof(List<Entidades.Album>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna álbum")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10SwipesAlbumsByUser(
+            [SwaggerParameter(Description = "UID del usuario.")]
+            String uid)
+        {
+            IActionResult salida;
+            List<Entidades.Album> albums;
+
+            try
+            {
+                albums = await ListadosUserAlbumDAL.getTop10SwipesAlbumsByUserDAL(uid);
+                if (albums.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún álbum");
+                }
+                else
+                {
+                    salida = Ok(albums);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
 
         // GET api/<User>/5/artists
         [HttpGet("{uid}/artists")]
@@ -482,7 +743,7 @@ namespace Back.Controllers.API
 
             try
             {
-                paginatedArtists = await ListadosUserDAL.getFavArtistsDAL(uid, page, limit, baseUrl);
+                paginatedArtists = await ListadosUserArtistDAL.getFavArtistsDAL(uid, page, limit, baseUrl);
                 if (paginatedArtists.Artists.Count == 0)
                 {
                     salida = NotFound("No se ha encontrado ningún artista");
@@ -536,7 +797,7 @@ namespace Back.Controllers.API
 
             try
             {
-                paginatedGenres = await ListadosUserDAL.getFavGenresDAL(uid, page, limit, baseUrl);
+                paginatedGenres = await ListadosUserGenresDAL.getFavGenresDAL(uid, page, limit, baseUrl);
                 if (paginatedGenres.Genres.Count == 0)
                 {
                     salida = NotFound("No se ha encontrado ningún género");
@@ -722,7 +983,7 @@ namespace Back.Controllers.API
 
             try
             {
-                artistsIds = ListadosUserDAL.getUserFavoriteArtistsIdsDAL(uid);
+                artistsIds = ListadosUserArtistDAL.getUserFavoriteArtistsIdsDAL(uid);
 
                 if (artistsIds.IsNullOrEmpty())
                 {
@@ -762,7 +1023,7 @@ namespace Back.Controllers.API
 
             try
             {
-                genresIds = ListadosUserDAL.getUserFavoriteGenresIdsDAL(uid);
+                genresIds = ListadosUserGenresDAL.getUserFavoriteGenresIdsDAL(uid);
 
                 if (genresIds.IsNullOrEmpty())
                 {
@@ -978,7 +1239,7 @@ namespace Back.Controllers.API
 
             try
             {
-                tracksNotSaved = MetodosUserDAL.hasUserSavedTrackDAL(uid, idsTracks);
+                tracksNotSaved = MetodosUserTrackDAL.hasUserSavedTrackDAL(uid, idsTracks);
 
                 salida = Ok(tracksNotSaved);
 
@@ -1180,7 +1441,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.addArtistsToFavoritesDAL(uid, artistas);
+                numFilasAfectadas = MetodosUserArtistDAL.addArtistsToFavoritesDAL(uid, artistas);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
@@ -1218,7 +1479,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.addGenresToFavoritesDAL(uid, generos);
+                numFilasAfectadas = MetodosUserGenresDAL.addGenresToFavoritesDAL(uid, generos);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);
@@ -1256,7 +1517,7 @@ namespace Back.Controllers.API
 
             try
             {
-                numFilasAfectadas = MetodosUserDAL.saveSwipesDAL(uid, swipes);
+                numFilasAfectadas = MetodosUserTrackDAL.saveSwipesDAL(uid, swipes);
                 if (numFilasAfectadas == 0)
                 {
                     salida = NotFound(numFilasAfectadas);

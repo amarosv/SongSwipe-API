@@ -1,4 +1,5 @@
-﻿using DAL;
+﻿using DAL.Lists;
+using DAL.Methods;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -105,6 +106,111 @@ namespace Back.Controllers.API
             catch (Exception ex)
             {
                 salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<Album>/top_liked_albums
+        [HttpGet("top_liked_albums")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 albumes con más me gustas globales",
+            Description = "Este método obtiene el top 10 albumes con más me gustas globales y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de artistas obtenida correctamente", typeof(List<Entidades.Album>))]
+        [SwaggerResponse(404, "No se ha encontrado ningun álbum")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10LikedArtists()
+        {
+            IActionResult salida;
+            List<Entidades.Album> albums;
+
+            try
+            {
+                albums = await ListadosAlbumsDAL.getTop10LikedAlbumsGlobalDAL();
+                if (albums.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún álbum");
+                }
+                else
+                {
+                    salida = Ok(albums);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<Album>/top_disliked_albums
+        [HttpGet("top_disliked_albums")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 albumes con más no me gustas globales",
+            Description = "Este método obtiene el top 10 albumes con más no me gustas globales y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de albumes obtenida correctamente", typeof(List<Entidades.Album>))]
+        [SwaggerResponse(404, "No se ha encontrado ningun álbum")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10DislikedAlbumsByUser()
+        {
+            IActionResult salida;
+            List<Entidades.Album> albums;
+
+            try
+            {
+                albums = await ListadosAlbumsDAL.getTop10DislikedAlbumsGlobalDAL();
+                if (albums.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún álbum");
+                }
+                else
+                {
+                    salida = Ok(albums);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<Album>/top_swipes_albums
+        [HttpGet("top_swipes_albums")]
+        [SwaggerOperation(
+            Summary = "Obtiene un listado con top 10 albumes con más swipes globales",
+            Description = "Este método obtiene el top 10 albumes con más swipes globales y las devuelve como un listado.<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Lista de albumes obtenida correctamente", typeof(List<Entidades.Album>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna álbum")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTop10SwipesAlbumsByUser()
+        {
+            IActionResult salida;
+            List<Entidades.Album> albums;
+
+            try
+            {
+                albums = await ListadosAlbumsDAL.getTop10SwipesAlbumsGlobalDAL();
+                if (albums.Count == 0)
+                {
+                    salida = NotFound("No se ha encontrado ningún álbum");
+                }
+                else
+                {
+                    salida = Ok(albums);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
             }
 
             return salida;

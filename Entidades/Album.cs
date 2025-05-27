@@ -38,6 +38,7 @@ namespace Entidades
         public Object Fallback {  get; set; }
         public Artist Artist { get; set; }
         public TracksWrapper Tracks { get; set; }
+        public int Likes { get; set; }
         #endregion
 
         #region Constructores 

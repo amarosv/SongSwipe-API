@@ -30,5 +30,54 @@ namespace DAL.Utils
                 userBlocked: (bool)reader["UserBlocked"]
             );
         }
+
+        /// <summary>
+        /// Esta función obtiene los ids de las canciones/generos/artistas de la base de datos
+        /// y los devuelve como una lista
+        /// </summary>
+        /// <param name="procedure">Procedure a ejecutar</param>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de ids de canciones/generos/artistas</returns>
+        public static (int totalPages, List<long> list) getListIdsDAL(string procedure, string uid, int page, int limit)
+        {
+            List<long> ids = new();
+            int totalPages = 0;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = procedure;
+                    cmd.Parameters.AddWithValue("@UID", uid);
+                    cmd.Parameters.AddWithValue("@page", page);
+                    cmd.Parameters.AddWithValue("@limit", limit);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            totalPages = reader.GetInt32(0);
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                ids.Add((long)reader["ID"]);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return (totalPages, ids);
+        }
+
     }
 }

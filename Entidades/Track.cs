@@ -38,6 +38,8 @@ namespace Entidades
         public SimpleArtist Artist { get; set; }
         public SimpleAlbum Album { get; set; }
         public String Type { get; set; }
+
+        public bool Like { get; set; }
         #endregion
 
         #region Constructores 

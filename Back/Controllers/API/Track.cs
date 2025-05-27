@@ -1,4 +1,4 @@
-﻿using DAL;
+﻿using DAL.Methods;
 using Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

@@ -22,6 +22,8 @@ namespace Entidades
         public int Nb_Fans { get; set; }
         public bool Radio { get; set; }
         public String TrackList { get; set; }
+
+        public int Likes { get; set; }
         #endregion
 
         #region Constructores

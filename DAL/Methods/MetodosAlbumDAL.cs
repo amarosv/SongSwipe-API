@@ -3,43 +3,36 @@ using Entidades;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL
+namespace DAL.Methods
 {
-    public class MetodosTrackDAL
+    public class MetodosAlbumDAL
     {
         /// <summary>
-        /// Esta función recibe el id de una canción y devuelve sus datos
+        /// Esta función recibe el id de un álbum y devuelve sus datos
         /// </summary>
-        /// <param name="id">Id de la canción</param>
-        /// <returns>Datos de la canción</returns>
-        public static async Task<Track> getTrackById(int id)
+        /// <param name="id">Id del album</param>
+        /// <returns>Datos del album</returns>
+        public static async Task<Album> getAlbumById(int id)
         {
-            Track track = null;
-
-            // Verificamos si la canción ya está en el cache
-            if (DeezerCache.TryGetTrack(id, out Track cachedTrack))
+            if (DeezerCache.TryGetAlbum(id, out Album cachedAlbum))
             {
-                track = cachedTrack;
-            }
-            else
-            {
-                track = await CallApiDeezer.HandleRateLimitAndGetTrack(id);
+                return cachedAlbum;
             }
 
-            return track;
+            return await CallApiDeezer.HandleRateLimitAndGetAlbum(id);
         }
 
+
         /// <summary>
-        /// Esta función recibe el id de una canción y devuelve el número de likes de esta
+        /// Esta función recibe el id de un álbum y devuelve el número de likes de este
         /// </summary>
-        /// <param name="idTrack">ID de la canción</param>
+        /// <param name="idAlbum">ID del album</param>
         /// <returns>Número de likes</returns>
-        public static int getLikesByTrack(long idTrack)
+        public static int getLikesByAlbum(long idAlbum)
         {
             int likes = 0;
 
@@ -48,8 +41,8 @@ namespace DAL
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "EXEC GetLikesTrack @IDTrack";
-                    cmd.Parameters.AddWithValue("@IDTrack", idTrack);
+                    cmd.CommandText = "EXEC GetLikesAlbum @IDAlbum";
+                    cmd.Parameters.AddWithValue("@IDAlbum", idAlbum);
 
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -69,12 +62,13 @@ namespace DAL
             return likes;
         }
 
+
         /// <summary>
-        /// Esta función recibe el id de una canción y devuelve el número de dislikes de esta
+        /// Esta función recibe el id de un álbum y devuelve el número de dislikes de este
         /// </summary>
-        /// <param name="idTrack">ID de la canción</param>
+        /// <param name="idAlbum">ID del album</param>
         /// <returns>Número de dislikes</returns>
-        public static int getDislikesByTrack(long idTrack)
+        public static int getDislikesByAlbum(long idAlbum)
         {
             int dislikes = 0;
 
@@ -83,8 +77,8 @@ namespace DAL
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "EXEC GetDislikesTrack @IDTrack";
-                    cmd.Parameters.AddWithValue("@IDTrack", idTrack);
+                    cmd.CommandText = "EXEC GetDislikesAlbum @IDAlbum";
+                    cmd.Parameters.AddWithValue("@IDAlbum", idAlbum);
 
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
