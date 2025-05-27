@@ -31,6 +31,8 @@ namespace DAL
                 using (SqlCommand cmd = new SqlCommand("SELECT * FROM USERS WHERE UID = @UID AND UserDeleted = 0 AND UserBlocked = 0", conn))
                 {
                     cmd.Parameters.Add("@UID", SqlDbType.VarChar).Value = uid;
+                    conn.Open();
+
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.HasRows)
@@ -82,6 +84,8 @@ namespace DAL
                     cmd.Parameters.Add("@deleted", SqlDbType.Bit).Value = user.UserDeleted;
                     cmd.Parameters.Add("@blocked", SqlDbType.Bit).Value = user.UserBlocked;
 
+                    conn.Open();
+
                     affectedRows = cmd.ExecuteNonQuery();
                 }
             }
@@ -104,6 +108,8 @@ namespace DAL
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("DELETE FROM USERS WHERE UID = @uid", conn))
                 {
+                    conn.Open();
+
                     cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
                     numFilasAfectadas = cmd.ExecuteNonQuery();
                 }
@@ -127,6 +133,8 @@ namespace DAL
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("UPDATE USERS SET Name = @name, LastName = @lastName, Email = @email, PhotoUrl = @photoUrl, Username = @username WHERE UID = @uid", conn))
                 {
+                    conn.Open();
+
                     cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = user.UID;
                     cmd.Parameters.Add("@name", SqlDbType.VarChar).Value = user.Name;
                     cmd.Parameters.Add("@lastName", SqlDbType.VarChar).Value = user.LastName;
@@ -158,6 +166,8 @@ namespace DAL
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) AS TOTAL FROM USERS WHERE Username = @username", conn))
                 {
+                    conn.Open();
+
                     cmd.Parameters.Add("@username", SqlDbType.VarChar).Value = username;
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -192,6 +202,8 @@ namespace DAL
             {
                 using (SqlConnection conn = clsConexion.GetConnection())
                 {
+                    conn.Open();
+
                     foreach (long id in artists)
                     {
                         using (SqlCommand cmd = new SqlCommand("INSERT INTO USERARTISTS (UID, IDArtist) VALUES (@uid, @IDArtist)", conn))
@@ -223,6 +235,8 @@ namespace DAL
             {
                 using (SqlConnection conn = clsConexion.GetConnection())
                 {
+                    conn.Open();
+
                     foreach (long id in genres)
                     {
                         using (SqlCommand cmd = new SqlCommand("INSERT INTO USERGENRES (UID, IDGenre) VALUES (@uid, @IDGenre)", conn))
@@ -253,6 +267,8 @@ namespace DAL
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("EXEC GetUserProfileData @UID", conn))
                 {
+                    conn.Open();
+
                     cmd.Parameters.AddWithValue("@UID", uid);
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
