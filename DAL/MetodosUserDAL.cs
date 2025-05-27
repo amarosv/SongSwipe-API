@@ -24,53 +24,36 @@ namespace DAL
         public static Usuario getUserByUIDDAL(String uid)
         {
             Usuario user = null;
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            String supplier = "";
-            bool blocked = false;
-            bool deleted = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@UID", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.CommandText = "SELECT * FROM USERS WHERE UID = @UID AND UserDeleted = 0 AND UserBlocked = 0";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM USERS WHERE UID = @UID AND UserDeleted = 0 AND UserBlocked = 0", conn))
                 {
-                    while (miLector.Read())
+                    cmd.Parameters.Add("@UID", SqlDbType.VarChar).Value = uid;
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        supplier = (String)miLector["Supplier"];
-                        deleted = (bool)miLector["UserDeleted"];
-                        blocked = (bool)miLector["UserBlocked"];
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string name = (string)reader["Name"];
+                                string lastName = (string)reader["LastName"];
+                                string email = (string)reader["Email"];
+                                string photoUrl = (string)reader["PhotoUrl"];
+                                string dateJoining = ((DateTime)reader["DateJoining"]).ToString();
+                                string username = (string)reader["Username"];
+                                string supplier = (string)reader["Supplier"];
+                                bool deleted = (bool)reader["UserDeleted"];
+                                bool blocked = (bool)reader["UserBlocked"];
 
-                        user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
+                                user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
+                            }
+                        }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
             return user;
         }
@@ -82,39 +65,29 @@ namespace DAL
         /// <returns>Número de filas afectadas</returns>
         public static int createUserDAL(Usuario user)
         {
-            int numFilasAfectadas = 0;
-
-            SqlCommand miComando = new SqlCommand();
+            int affectedRows = 0;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("INSERT INTO USERS (UID, Name, LastName, Email, PhotoUrl, Username, Supplier, UserDeleted, UserBlocked) VALUES (@uid, @name, @lastName, @email, @photoUrl, @username, @supplier, @deleted, @blocked)", conn))
+                {
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = user.UID;
+                    cmd.Parameters.Add("@name", SqlDbType.VarChar).Value = user.Name;
+                    cmd.Parameters.Add("@lastName", SqlDbType.VarChar).Value = user.LastName;
+                    cmd.Parameters.Add("@email", SqlDbType.VarChar).Value = user.Email;
+                    cmd.Parameters.Add("@photoUrl", SqlDbType.VarChar).Value = user.PhotoURL;
+                    cmd.Parameters.Add("@username", SqlDbType.VarChar).Value = user.Username;
+                    cmd.Parameters.Add("@supplier", SqlDbType.VarChar).Value = user.Supplier;
+                    cmd.Parameters.Add("@deleted", SqlDbType.Bit).Value = user.UserDeleted;
+                    cmd.Parameters.Add("@blocked", SqlDbType.Bit).Value = user.UserBlocked;
 
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = user.UID;
-                miComando.Parameters.Add("@name", System.Data.SqlDbType.VarChar).Value = user.Name;
-                miComando.Parameters.Add("@lastName", System.Data.SqlDbType.VarChar).Value = user.LastName;
-                miComando.Parameters.Add("@email", System.Data.SqlDbType.VarChar).Value = user.Email;
-                miComando.Parameters.Add("@photoUrl", System.Data.SqlDbType.VarChar).Value = user.PhotoURL;
-                miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = user.Username;
-                miComando.Parameters.Add("@supplier", System.Data.SqlDbType.VarChar).Value = user.Supplier;
-                miComando.Parameters.Add("@deleted", System.Data.SqlDbType.Bit).Value = user.UserDeleted;
-                miComando.Parameters.Add("@blocked", System.Data.SqlDbType.Bit).Value = user.UserBlocked;
-
-                miComando.CommandText = "INSERT INTO USERS (UID, Name, LastName, Email, PhotoUrl, Username, Supplier, UserDeleted, UserBlocked)" +
-                    "VALUES (@uid, @name, @lastName, @email, @photoUrl, @username, @supplier, @deleted, @blocked)";
-
-                numFilasAfectadas = miComando.ExecuteNonQuery();
+                    affectedRows = cmd.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
-            return numFilasAfectadas;
+            return affectedRows;
         }
 
         /// <summary>
@@ -126,26 +99,16 @@ namespace DAL
         {
             int numFilasAfectadas = 0;
 
-            SqlCommand miComando = new SqlCommand();
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-
-                miComando.CommandText = "DELETE FROM USERS WHERE UID = @uid";
-
-                numFilasAfectadas = miComando.ExecuteNonQuery();
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("DELETE FROM USERS WHERE UID = @uid", conn))
+                {
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
             return numFilasAfectadas;
         }
@@ -157,39 +120,28 @@ namespace DAL
         /// <returns>Número de filas afectadas</returns>
         public static int updateUserDAL(Usuario user)
         {
-            int numFilasAfectadas = 0;
-
-            SqlCommand miComando = new SqlCommand();
+            int affectedRows = 0;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("UPDATE USERS SET Name = @name, LastName = @lastName, Email = @email, PhotoUrl = @photoUrl, Username = @username WHERE UID = @uid", conn))
+                {
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = user.UID;
+                    cmd.Parameters.Add("@name", SqlDbType.VarChar).Value = user.Name;
+                    cmd.Parameters.Add("@lastName", SqlDbType.VarChar).Value = user.LastName;
+                    cmd.Parameters.Add("@email", SqlDbType.VarChar).Value = user.Email;
+                    cmd.Parameters.Add("@photoUrl", SqlDbType.VarChar).Value = user.PhotoURL;
+                    cmd.Parameters.Add("@username", SqlDbType.VarChar).Value = user.Username;
+                    cmd.Parameters.Add("@deleted", SqlDbType.Bit).Value = user.UserDeleted;
+                    cmd.Parameters.Add("@blocked", SqlDbType.Bit).Value = user.UserBlocked;
 
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = user.UID;
-                miComando.Parameters.Add("@name", System.Data.SqlDbType.VarChar).Value = user.Name;
-                miComando.Parameters.Add("@lastName", System.Data.SqlDbType.VarChar).Value = user.LastName;
-                miComando.Parameters.Add("@email", System.Data.SqlDbType.VarChar).Value = user.Email;
-                miComando.Parameters.Add("@photoUrl", System.Data.SqlDbType.VarChar).Value = user.PhotoURL;
-                miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = user.Username;
-                miComando.Parameters.Add("@deleted", System.Data.SqlDbType.Bit).Value = user.UserDeleted;
-                miComando.Parameters.Add("@blocked", System.Data.SqlDbType.Bit).Value = user.UserBlocked;
-
-                miComando.CommandText = "UPDATE USERS " +
-                    "SET Name = @name, LastName = @lastName, Email = @email, PhotoUrl = @photoUrl, Username = @username " +
-                    "WHERE UID = @uid";
-
-                numFilasAfectadas = miComando.ExecuteNonQuery();
+                    affectedRows = cmd.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
-            return numFilasAfectadas;
+            return affectedRows;
         }
 
         /// <summary>
@@ -200,35 +152,27 @@ namespace DAL
         public static bool checkUsernameDAL(String username)
         {
             bool exists = false;
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@username", System.Data.SqlDbType.VarChar).Value = username;
-                miComando.CommandText = "SELECT COUNT(*) AS TOTAL FROM USERS WHERE Username = @username";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) AS TOTAL FROM USERS WHERE Username = @username", conn))
                 {
-                    while (miLector.Read())
+                    cmd.Parameters.Add("@username", SqlDbType.VarChar).Value = username;
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        int total = (int)miLector["TOTAL"];
-
-                        exists = total > 0;
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                int total = (int)reader["TOTAL"];
+                                exists = total > 0;
+                            }
+                        }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
             return exists;
         }
@@ -244,36 +188,22 @@ namespace DAL
         {
             int numFilasAfectadas = 0;
 
-            SqlCommand miComando = new SqlCommand();
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                foreach (long id in artists)
+                using (SqlConnection conn = clsConexion.GetConnection())
                 {
-                    // Crear un nuevo parámetro para cada iteración
-                    SqlParameter uidUser = miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar);
-                    uidUser.Value = uid;
-                    SqlParameter idArtistParam = new SqlParameter("@IDArtist", System.Data.SqlDbType.BigInt);
-                    idArtistParam.Value = id;
-                    miComando.Parameters.Clear();  // Limpiar los parámetros previos
-                    miComando.Parameters.Add(uidUser);
-                    miComando.Parameters.Add(idArtistParam);  // Añadir el nuevo parámetro
-
-                    miComando.CommandText = "INSERT INTO USERARTISTS (UID, IDArtist) VALUES (@uid, @IDArtist)";
-                    numFilasAfectadas += miComando.ExecuteNonQuery();
+                    foreach (long id in artists)
+                    {
+                        using (SqlCommand cmd = new SqlCommand("INSERT INTO USERARTISTS (UID, IDArtist) VALUES (@uid, @IDArtist)", conn))
+                        {
+                            cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                            cmd.Parameters.Add("@IDArtist", SqlDbType.BigInt).Value = id;
+                            numFilasAfectadas += cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
-
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
             return numFilasAfectadas;
         }
@@ -289,36 +219,22 @@ namespace DAL
         {
             int numFilasAfectadas = 0;
 
-            SqlCommand miComando = new SqlCommand();
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                foreach (long id in genres)
+                using (SqlConnection conn = clsConexion.GetConnection())
                 {
-                    // Crear un nuevo parámetro para cada iteración
-                    SqlParameter uidUser = miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar);
-                    uidUser.Value = uid;
-                    SqlParameter idGenreParam = new SqlParameter("@IDGenre", System.Data.SqlDbType.BigInt);
-                    idGenreParam.Value = id;
-                    miComando.Parameters.Clear();  // Limpiar los parámetros previos
-                    miComando.Parameters.Add(uidUser);
-                    miComando.Parameters.Add(idGenreParam);  // Añadir el nuevo parámetro
-
-                    miComando.CommandText = "INSERT INTO USERGENRES (UID, IDGenre) VALUES (@uid, @IDGenre)";
-                    numFilasAfectadas += miComando.ExecuteNonQuery();
+                    foreach (long id in genres)
+                    {
+                        using (SqlCommand cmd = new SqlCommand("INSERT INTO USERGENRES (UID, IDGenre) VALUES (@uid, @IDGenre)", conn))
+                        {
+                            cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                            cmd.Parameters.Add("@IDGenre", SqlDbType.BigInt).Value = id;
+                            numFilasAfectadas += cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
-
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
             return numFilasAfectadas;
         }
@@ -331,55 +247,37 @@ namespace DAL
         public static UserProfile getUserProfileDataDAL(String uid)
         {
             UserProfile userProfile = null;
-            String uidUser = "";
-            String name = "";
-            String lastName = "";
-            String email = "";
-            String photoUrl = "";
-            String dateJoining = "";
-            String username = "";
-            int savedSongs;
-            int followers;
-            int following;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetUserProfileData @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("EXEC GetUserProfileData @UID", conn))
                 {
-                    while (miLector.Read())
+                    cmd.Parameters.AddWithValue("@UID", uid);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        uidUser = (String)miLector["UID"];
-                        name = (String)miLector["Name"];
-                        lastName = (String)miLector["LastName"];
-                        email = (String)miLector["Email"];
-                        photoUrl = (String)miLector["PhotoUrl"];
-                        dateJoining = ((DateTime)miLector["DateJoining"]).ToString();
-                        username = (String)miLector["Username"];
-                        savedSongs = (int)miLector["SavedSongs"];
-                        followers = (int)miLector["Followers"];
-                        following = (int)miLector["Following"];
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string uidUser = (string)reader["UID"];
+                                string name = (string)reader["Name"];
+                                string lastName = (string)reader["LastName"];
+                                string email = (string)reader["Email"];
+                                string photoUrl = (string)reader["PhotoUrl"];
+                                string dateJoining = ((DateTime)reader["DateJoining"]).ToString();
+                                string username = (string)reader["Username"];
+                                int savedSongs = (int)reader["SavedSongs"];
+                                int followers = (int)reader["Followers"];
+                                int following = (int)reader["Following"];
 
-                        userProfile = new UserProfile(uid, username, name, lastName, photoUrl, dateJoining, email, savedSongs, followers, following);
+                                userProfile = new UserProfile(uid, username, name, lastName, photoUrl, dateJoining, email, savedSongs, followers, following);
+                            }
+                        }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
+            catch (Exception) { throw; }
 
             return userProfile;
         }
@@ -389,77 +287,60 @@ namespace DAL
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Ajustes del usuario</returns>
-        public static Settings getUserSettingsDAL(String uid)
+        public static Settings getUserSettingsDAL(string uid)
         {
             Settings settings = null;
-            int mode;
-            int theme;
-            bool cardAnimatedCover;
-            bool cardSkipSongs;
-            bool cardBlurredCoverAsBackground;
-            int privacyVisSavedSongs;
-            int privacyVisStats;
-            int privacyVisFol;
-            bool privateAccount;
-            string language;
-            bool audioLoop;
-            bool audioAutoPlay;
-            bool audioOnlyAudio;
-            bool notifications;
-            bool notiFriendsRequest;
-            bool notiFriendsApproved;
-            bool notiAppUpdate;
-            bool notiAppRecap;
-            bool notiAccountBlocked;
-            bool showTutorial;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.CommandText = "EXEC GetUserSettings @UID";
-                miComando.Parameters.AddWithValue("@UID", uid);
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conexion = clsConexion.GetConnection())
+                using (SqlCommand comando = new SqlCommand("EXEC GetUserSettings @UID", conexion))
                 {
-                    while (miLector.Read())
-                    {
-                        mode = (int)miLector["Mode"];
-                        theme = (int)miLector["Theme"];
-                        cardAnimatedCover = (bool)miLector["Card_Animated_Cover"];
-                        cardSkipSongs = (bool)miLector["Card_Skip_Songs"];
-                        cardBlurredCoverAsBackground = (bool)miLector["Card_Blurred_Cover_As_Background"];
-                        privacyVisSavedSongs = (int)miLector["Privacy_Vis_Saved_Songs"];
-                        privacyVisStats = (int)miLector["Privacy_Vis_Stats"];
-                        privacyVisFol = (int)miLector["Privacy_Vis_Fol"];
-                        privateAccount = (bool)miLector["Private_Account"];
-                        language = (string)miLector["Language"];
-                        audioLoop = (bool)miLector["Audio_Loop"];
-                        audioAutoPlay = (bool)miLector["Audio_Autoplay"];
-                        audioOnlyAudio = (bool)miLector["Audio_Only_Audio"];
-                        notifications = (bool)miLector["Notifications"];
-                        notiFriendsRequest = (bool)miLector["Noti_Friends_Request"];
-                        notiFriendsApproved = (bool)miLector["Noti_Friends_Approved"];
-                        notiAppUpdate = (bool)miLector["Noti_App_Update"];
-                        notiAppRecap = (bool)miLector["Noti_App_Recap"];
-                        notiAccountBlocked = (bool)miLector["Noti_Account_Blocked"];
-                        showTutorial = (bool)miLector["Show_Tutorial"];
+                    comando.Parameters.AddWithValue("@UID", uid);
 
-                        settings = new Settings(mode, theme, cardAnimatedCover, cardSkipSongs, cardBlurredCoverAsBackground, privacyVisSavedSongs, privacyVisStats, privacyVisFol, privateAccount, language, audioLoop, audioAutoPlay, audioOnlyAudio, notifications, notiFriendsRequest, notiFriendsApproved, notiAppUpdate, notiAppRecap, notiAccountBlocked, showTutorial);
+                    conexion.Open();
+                    using (SqlDataReader lector = comando.ExecuteReader())
+                    {
+                        if (lector.HasRows)
+                        {
+                            while (lector.Read())
+                            {
+                                int mode = (int)lector["Mode"];
+                                int theme = (int)lector["Theme"];
+                                bool cardAnimatedCover = (bool)lector["Card_Animated_Cover"];
+                                bool cardSkipSongs = (bool)lector["Card_Skip_Songs"];
+                                bool cardBlurredCoverAsBackground = (bool)lector["Card_Blurred_Cover_As_Background"];
+                                int privacyVisSavedSongs = (int)lector["Privacy_Vis_Saved_Songs"];
+                                int privacyVisStats = (int)lector["Privacy_Vis_Stats"];
+                                int privacyVisFol = (int)lector["Privacy_Vis_Fol"];
+                                bool privateAccount = (bool)lector["Private_Account"];
+                                string language = (string)lector["Language"];
+                                bool audioLoop = (bool)lector["Audio_Loop"];
+                                bool audioAutoPlay = (bool)lector["Audio_Autoplay"];
+                                bool audioOnlyAudio = (bool)lector["Audio_Only_Audio"];
+                                bool notifications = (bool)lector["Notifications"];
+                                bool notiFriendsRequest = (bool)lector["Noti_Friends_Request"];
+                                bool notiFriendsApproved = (bool)lector["Noti_Friends_Approved"];
+                                bool notiAppUpdate = (bool)lector["Noti_App_Update"];
+                                bool notiAppRecap = (bool)lector["Noti_App_Recap"];
+                                bool notiAccountBlocked = (bool)lector["Noti_Account_Blocked"];
+                                bool showTutorial = (bool)lector["Show_Tutorial"];
+
+                                settings = new Settings(
+                                    mode, theme, cardAnimatedCover, cardSkipSongs, cardBlurredCoverAsBackground,
+                                    privacyVisSavedSongs, privacyVisStats, privacyVisFol, privateAccount, language,
+                                    audioLoop, audioAutoPlay, audioOnlyAudio, notifications,
+                                    notiFriendsRequest, notiFriendsApproved, notiAppUpdate,
+                                    notiAppRecap, notiAccountBlocked, showTutorial
+                                );
+                            }
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return settings;
@@ -471,56 +352,68 @@ namespace DAL
         /// <param name="settings">Ajustes modificados</param>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int updateUserSettingsDAL(Settings settings, String uid)
+        public static int updateUserSettingsDAL(Settings settings, string uid)
         {
             int numFilasAfectadas = 0;
 
-            SqlCommand miComando = new SqlCommand();
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
+                using (SqlConnection conexion = clsConexion.GetConnection())
+                using (SqlCommand comando = conexion.CreateCommand())
+                {
+                    comando.CommandText = @"
+                UPDATE USERSETTINGS
+                SET Mode = @mode,
+                    Theme = @theme,
+                    Card_Animated_Cover = @cardAnimatedCover,
+                    Card_Skip_Songs = @cardSkipSongs,
+                    Card_Blurred_Cover_As_Background = @cardBlurredCoverAsBackground,
+                    Privacy_Vis_Saved_Songs = @privacyVisSavedSongs,
+                    Privacy_Vis_Stats = @privacyVisStats,
+                    Privacy_Vis_Fol = @privacyVisFol,
+                    Private_Account = @privateAccount,
+                    Language = @language,
+                    Audio_Loop = @audioLoop,
+                    Audio_Autoplay = @audioAutoPlay,
+                    Audio_Only_Audio = @audioOnlyAudio,
+                    Notifications = @notifications,
+                    Noti_Friends_Request = @notiFriendRequest,
+                    Noti_Friends_Approved = @notiFriendApproved,
+                    Noti_App_Update = @notiAppUpdate,
+                    Noti_App_Recap = @notiAppRecap,
+                    Noti_Account_Blocked = @notiAccountBlocked,
+                    Show_Tutorial = @showTutorial
+                WHERE UID = @uid";
 
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@mode", System.Data.SqlDbType.Int).Value = settings.Mode;
-                miComando.Parameters.Add("@theme", System.Data.SqlDbType.Int).Value = settings.Theme;
-                miComando.Parameters.Add("@cardAnimatedCover", System.Data.SqlDbType.Bit).Value = settings.CardAnimatedCover;
-                miComando.Parameters.Add("@cardSkipSongs", System.Data.SqlDbType.Bit).Value = settings.CardSkipSongs;
-                miComando.Parameters.Add("@cardBlurredCoverAsBackground", System.Data.SqlDbType.Bit).Value = settings.CardBlurredCoverAsBackground;
-                miComando.Parameters.Add("@privacyVisSavedSongs", System.Data.SqlDbType.Int).Value = settings.PrivacyVisSavedSongs;
-                miComando.Parameters.Add("@privacyVisStats", System.Data.SqlDbType.Int).Value = settings.PrivacyVisStats;
-                miComando.Parameters.Add("@privacyVisFol", System.Data.SqlDbType.Int).Value = settings.PrivacyVisFol;
-                miComando.Parameters.Add("@privateAccount", System.Data.SqlDbType.Bit).Value = settings.PrivateAccount;
-                miComando.Parameters.Add("@language", System.Data.SqlDbType.VarChar).Value = settings.Language;
-                miComando.Parameters.Add("@audioLoop", System.Data.SqlDbType.Bit).Value = settings.AudioLoop;
-                miComando.Parameters.Add("@audioAutoPlay", System.Data.SqlDbType.Bit).Value = settings.AudioAutoPlay;
-                miComando.Parameters.Add("@audioOnlyAudio", System.Data.SqlDbType.Bit).Value = settings.AudioOnlyAudio;
-                miComando.Parameters.Add("@notifications", System.Data.SqlDbType.Bit).Value = settings.Notifications;
-                miComando.Parameters.Add("@notiFriendRequest", System.Data.SqlDbType.Bit).Value = settings.NotiFriendsRequest;
-                miComando.Parameters.Add("@notiFriendApproved", System.Data.SqlDbType.Bit).Value = settings.NotiFriendsApproved;
-                miComando.Parameters.Add("@notiAppUpdate", System.Data.SqlDbType.Bit).Value = settings.NotiAppUpdate;
-                miComando.Parameters.Add("@notiAppRecap", System.Data.SqlDbType.Bit).Value = settings.NotiAppRecap;
-                miComando.Parameters.Add("@notiAccountBlocked", System.Data.SqlDbType.Bit).Value = settings.NotiAccountBlocked;
-                miComando.Parameters.Add("@showTutorial", System.Data.SqlDbType.Bit).Value = settings.ShowTutorial;
+                    comando.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    comando.Parameters.Add("@mode", SqlDbType.Int).Value = settings.Mode;
+                    comando.Parameters.Add("@theme", SqlDbType.Int).Value = settings.Theme;
+                    comando.Parameters.Add("@cardAnimatedCover", SqlDbType.Bit).Value = settings.CardAnimatedCover;
+                    comando.Parameters.Add("@cardSkipSongs", SqlDbType.Bit).Value = settings.CardSkipSongs;
+                    comando.Parameters.Add("@cardBlurredCoverAsBackground", SqlDbType.Bit).Value = settings.CardBlurredCoverAsBackground;
+                    comando.Parameters.Add("@privacyVisSavedSongs", SqlDbType.Int).Value = settings.PrivacyVisSavedSongs;
+                    comando.Parameters.Add("@privacyVisStats", SqlDbType.Int).Value = settings.PrivacyVisStats;
+                    comando.Parameters.Add("@privacyVisFol", SqlDbType.Int).Value = settings.PrivacyVisFol;
+                    comando.Parameters.Add("@privateAccount", SqlDbType.Bit).Value = settings.PrivateAccount;
+                    comando.Parameters.Add("@language", SqlDbType.VarChar).Value = settings.Language;
+                    comando.Parameters.Add("@audioLoop", SqlDbType.Bit).Value = settings.AudioLoop;
+                    comando.Parameters.Add("@audioAutoPlay", SqlDbType.Bit).Value = settings.AudioAutoPlay;
+                    comando.Parameters.Add("@audioOnlyAudio", SqlDbType.Bit).Value = settings.AudioOnlyAudio;
+                    comando.Parameters.Add("@notifications", SqlDbType.Bit).Value = settings.Notifications;
+                    comando.Parameters.Add("@notiFriendRequest", SqlDbType.Bit).Value = settings.NotiFriendsRequest;
+                    comando.Parameters.Add("@notiFriendApproved", SqlDbType.Bit).Value = settings.NotiFriendsApproved;
+                    comando.Parameters.Add("@notiAppUpdate", SqlDbType.Bit).Value = settings.NotiAppUpdate;
+                    comando.Parameters.Add("@notiAppRecap", SqlDbType.Bit).Value = settings.NotiAppRecap;
+                    comando.Parameters.Add("@notiAccountBlocked", SqlDbType.Bit).Value = settings.NotiAccountBlocked;
+                    comando.Parameters.Add("@showTutorial", SqlDbType.Bit).Value = settings.ShowTutorial;
 
-                miComando.CommandText = "UPDATE USERSETTINGS " +
-                    "SET Mode = @mode, Theme = @theme, Card_Animated_Cover = @cardAnimatedCover, Card_Skip_Songs = @cardSkipSongs," +
-                    "Card_Blurred_Cover_As_Background = @cardBlurredCoverAsBackground, Privacy_Vis_Saved_Songs = @privacyVisSavedSongs," +
-                    "Privacy_Vis_Stats = @privacyVisStats, Privacy_Vis_Fol = @privacyVisFol, Private_Account = @privateAccount, Language = @language," +
-                    "Audio_Loop = @audioLoop, Audio_Autoplay = @audioAutoPlay, Audio_Only_Audio = @audioOnlyAudio, Notifications = @notifications," +
-                    "Noti_Friends_Request = @notiFriendRequest, Noti_Friends_Approved = @notiFriendApproved, Noti_App_Update = @notiAppUpdate," +
-                    "Noti_App_Recap = @notiAppRecap, Noti_Account_Blocked = @notiAccountBlocked, Show_Tutorial = @showTutorial " +
-                    "WHERE UID = @uid";
-
-                numFilasAfectadas = miComando.ExecuteNonQuery();
+                    conexion.Open();
+                    numFilasAfectadas = comando.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return numFilasAfectadas;
@@ -531,37 +424,26 @@ namespace DAL
         /// </summary>
         /// <param name="email">Email a comprobar</param>
         /// <returns>Existe o no</returns>
-        public static bool checkEmailDAL(String email)
+        public static bool checkEmailDAL(string email)
         {
             bool exists = false;
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@email", System.Data.SqlDbType.VarChar).Value = email;
-                miComando.CommandText = "SELECT COUNT(*) AS TOTAL FROM USERS WHERE Email = @email";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conexion = clsConexion.GetConnection())
+                using (SqlCommand comando = conexion.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        int total = (int)miLector["TOTAL"];
+                    comando.CommandText = "SELECT COUNT(*) FROM USERS WHERE Email = @email";
+                    comando.Parameters.Add("@email", SqlDbType.VarChar).Value = email;
 
-                        exists = total > 0;
-                    }
+                    conexion.Open();
+                    int total = (int)comando.ExecuteScalar();
+                    exists = total > 0;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return exists;
@@ -581,12 +463,10 @@ namespace DAL
             try
             {
                 using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // Crear parámetros dinámicos
+                    // Crear parámetros dinámicos para la cláusula IN
                     List<string> paramNames = new List<string>();
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.Connection = conn;
-
                     for (int i = 0; i < idsTracks.Count; i++)
                     {
                         string paramName = "@id" + i;
@@ -597,13 +477,14 @@ namespace DAL
                     cmd.Parameters.AddWithValue("@uid", uid);
 
                     cmd.CommandText = $@"
-                        SELECT IDTrack 
-                        FROM USERSWIPES 
-                        WHERE UID = @uid AND IDTrack IN ({string.Join(", ", paramNames)})
-                    ";
+                SELECT IDTrack 
+                FROM USERSWIPES 
+                WHERE UID = @uid AND IDTrack IN ({string.Join(", ", paramNames)})
+            ";
+
+                    conn.Open();
 
                     HashSet<long> savedTrackIds = new HashSet<long>();
-
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -624,10 +505,7 @@ namespace DAL
             }
             catch (Exception ex)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return tracksNotSaved;
@@ -646,46 +524,39 @@ namespace DAL
             try
             {
                 using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // Construimos la parte VALUES del SQL
                     List<string> valuesClauses = new List<string>();
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.Connection = conn;
-
-                    cmd.CommandText = $"INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, IDArtist, Swipe) VALUES ";
 
                     for (int i = 0; i < swipes.Count; i++)
                     {
-                        cmd.CommandText += $"('{uid}', {swipes[i].Id}, {swipes[i].IdAlbum}, {swipes[i].IdArtist}, {swipes[i].Like})";
-                        if (i < swipes.Count - 1)
-                        {
-                            cmd.CommandText += ", ";
-                        }
+                        string idTrackParam = $"@idTrack{i}";
+                        string idAlbumParam = $"@idAlbum{i}";
+                        string idArtistParam = $"@idArtist{i}";
+                        string swipeParam = $"@swipe{i}";
 
-                        //string uidParam = $"@uid{i}";
-                        //string idTrackParam = $"@idTrack{i}";
-                        //string idAlbumParam = $"@idTrack{i}";
-                        //string swipeParam = $"@swipe{i}";
+                        valuesClauses.Add($"(@uid, {idTrackParam}, {idAlbumParam}, {idArtistParam}, {swipeParam})");
 
-                        //valuesClauses.Add($"({uidParam}, {idTrackParam}, {idAlbumParam}, {swipeParam})");
-
-                        //cmd.Parameters.AddWithValue(uidParam, uid);
-                        //cmd.Parameters.AddWithValue(idTrackParam, swipes[i].Id);
-                        //cmd.Parameters.AddWithValue(idAlbumParam, swipes[i].IdAlbum);
-                        //cmd.Parameters.AddWithValue(swipeParam, swipes[i].Like);
+                        cmd.Parameters.AddWithValue(idTrackParam, swipes[i].Id);
+                        cmd.Parameters.AddWithValue(idAlbumParam, swipes[i].IdAlbum);
+                        cmd.Parameters.AddWithValue(idArtistParam, swipes[i].IdArtist);
+                        cmd.Parameters.AddWithValue(swipeParam, swipes[i].Like);
                     }
 
-                    //cmd.CommandText = $"INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, Swipe) VALUES {string.Join(", ", valuesClauses)}";
+                    cmd.Parameters.AddWithValue("@uid", uid);
 
+                    cmd.CommandText = $@"
+                INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, IDArtist, Swipe)
+                VALUES {string.Join(", ", valuesClauses)}
+            ";
+
+                    conn.Open();
                     numFilasAfectadas = cmd.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return numFilasAfectadas;
@@ -697,49 +568,41 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="friend">UID del amigo</param>
         /// <returns>Son amigos o no</returns>
-        public static bool isMyFriendDAL(String uid, String friend) {
+        public static bool isMyFriendDAL(string uid, string friend)
+        {
             bool isMyFriend = false;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
-                miComando.CommandText = "WITH FriendsCheck AS (" +
-                    "SELECT 1 AS FRIEND FROM USERFRIENDS WHERE" +
-                    "(UID = @uid AND UIDFriend = @friend)" +
-                    "OR" +
-                    "(UID = @friend AND UIDFriend = @uid)" +
-                    ")" +
-                    "SELECT * FROM FriendsCheck WHERE (SELECT COUNT(*) FROM FriendsCheck) = 2";
-
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        int total = (int)miLector["FRIEND"];
+                    cmd.CommandText = @"
+                WITH FriendsCheck AS (
+                    SELECT 1 AS FRIEND FROM USERFRIENDS
+                    WHERE (UID = @uid AND UIDFriend = @friend)
+                       OR (UID = @friend AND UIDFriend = @uid)
+                )
+                SELECT * FROM FriendsCheck WHERE (SELECT COUNT(*) FROM FriendsCheck) = 2";
 
-                        isMyFriend = total == 1;
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        isMyFriend = reader.HasRows;
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return isMyFriend;
         }
+
 
         /// <summary>
         /// Esta función recibe el UID de un usuario y el UID de otro usuario y comprueba si lo sigue
@@ -747,83 +610,67 @@ namespace DAL
         /// <param name="uid">UID del usuario</param>
         /// <param name="friend">UID del seguido</param>
         /// <returns>Lo sigue o no</returns>
-        public static bool followingDAL(String uid, String uidUser)
+        public static bool followingDAL(string uid, string uidUser)
         {
             bool following = false;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = uidUser;
-                miComando.CommandText = "SELECT 1 AS 'FRIEND' FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        int total = (int)miLector["FRIEND"];
+                    cmd.CommandText = "SELECT 1 FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
 
-                        following = total == 1;
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@friend", SqlDbType.VarChar).Value = uidUser;
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        following = reader.HasRows;
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return following;
         }
-            
+
         /// <summary>
         /// Esta función recibe dos UIDs y envía una solicitud de amistad
         /// </summary>
         /// <param name="uid">UID del emisor</param>
         /// <param name="friend">UID del receptor</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int sendRequestDAL(String uid, String friend) {
+        public static int sendRequestDAL(string uid, string friend)
+        {
             int numFilasAfectadas = 0;
-
-            // Primero obtenemos si la cuenta a enviar la solicitud es pública
-            Settings settings = getUserSettingsDAL(friend);
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
+                Settings settings = getUserSettingsDAL(friend);
 
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
 
-                if (settings != null && !settings.PrivateAccount) {
-                    miComando.CommandText = "INSERT INTO USERFRIENDS (UID, UIDFriend) VALUES (@uid, @friend)";
-                } else {
-                    miComando.CommandText = "INSERT INTO USERFRIENDREQUEST (UIDSender, UIDReceiver) VALUES (@uid, @friend)";
+                    cmd.CommandText = (settings != null && !settings.PrivateAccount)
+                        ? "INSERT INTO USERFRIENDS (UID, UIDFriend) VALUES (@uid, @friend)"
+                        : "INSERT INTO USERFRIENDREQUEST (UIDSender, UIDReceiver) VALUES (@uid, @friend)";
+
+                    conn.Open();
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
                 }
-                
-                numFilasAfectadas = miComando.ExecuteNonQuery();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
-
 
             return numFilasAfectadas;
         }
@@ -834,32 +681,27 @@ namespace DAL
         /// <param name="uid">UID del emisor</param>
         /// <param name="friend">UID del receptor</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int deleteRequestDAL(String uid, String friend)
+        public static int deleteRequestDAL(string uid, string friend)
         {
             int numFilasAfectadas = 0;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend";
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
 
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
-                miComando.CommandText = "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend";
-
-                numFilasAfectadas = miComando.ExecuteNonQuery();
+                    conn.Open();
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
-
 
             return numFilasAfectadas;
         }
@@ -874,47 +716,38 @@ namespace DAL
         {
             int numFilasAfectadas = 0;
 
-            SqlConnection conexion = clsConexion.GetConnection();
-            SqlTransaction transaccion = null;
-
-            try
+            using (SqlConnection conn = clsConexion.GetConnection())
             {
-                // Iniciamos la transacción
-                transaccion = conexion.BeginTransaction();
+                conn.Open();
+                SqlTransaction transaccion = conn.BeginTransaction();
 
-                SqlCommand insertarAmigo = new SqlCommand(
-                    "INSERT INTO USERFRIENDS (UID, UIDFriend) VALUES (@uid, @friend)",
-                    conexion, transaccion);
+                try
+                {
+                    using (SqlCommand insertarAmigo = new SqlCommand(
+                        "INSERT INTO USERFRIENDS (UID, UIDFriend) VALUES (@uid, @friend)",
+                        conn, transaccion))
+                    {
+                        insertarAmigo.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                        insertarAmigo.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
+                        numFilasAfectadas += insertarAmigo.ExecuteNonQuery();
+                    }
 
-                insertarAmigo.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
-                insertarAmigo.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
+                    using (SqlCommand eliminarSolicitud = new SqlCommand(
+                        "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend",
+                        conn, transaccion))
+                    {
+                        eliminarSolicitud.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                        eliminarSolicitud.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
+                        numFilasAfectadas += eliminarSolicitud.ExecuteNonQuery();
+                    }
 
-                numFilasAfectadas += insertarAmigo.ExecuteNonQuery();
-
-                SqlCommand eliminarSolicitud = new SqlCommand(
-                    "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend",
-                    conexion, transaccion);
-
-                eliminarSolicitud.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
-                eliminarSolicitud.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
-
-                numFilasAfectadas += eliminarSolicitud.ExecuteNonQuery();
-
-                // Confirmamos la transacción si todo fue bien
-                transaccion.Commit();
-            }
-            catch (Exception)
-            {
-                // Si hay un error, deshacemos la transacción
-                if (transaccion != null)
+                    transaccion.Commit();
+                }
+                catch (Exception)
                 {
                     transaccion.Rollback();
+                    throw;
                 }
-                throw;
-            }
-            finally
-            {
-                clsConexion.Desconectar();
             }
 
             return numFilasAfectadas;
@@ -926,75 +759,64 @@ namespace DAL
         /// <param name="uid">UID del emisor</param>
         /// <param name="friend">UID del receptor</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int declineRequestDAL(String uid, String friend)
+        public static int declineRequestDAL(string uid, string friend)
         {
             int numFilasAfectadas = 0;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @friend AND UIDReceiver = @uid";
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
 
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
-                miComando.CommandText = "DELETE FROM USERFRIENDREQUEST WHERE UIDSender = @friend AND UIDReceiver = @uid";
-
-                numFilasAfectadas = miComando.ExecuteNonQuery();
+                    conn.Open();
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
-            finally
-            {
-                clsConexion.Desconectar();
-            }
-
 
             return numFilasAfectadas;
         }
-    
+
         /// <summary>
         /// Esta función recibe dos UIDs y comprueba si ya se le ha enviado una solicitud de amistad
         /// </summary>
         /// <param name="uid">UID del emisor</param>
         /// <param name="friend">UID del receptor</param>
         /// <returns>Solicitud enviada o no</returns>
-        public static bool requestSentDAL(String uid, String friend)
+        public static bool requestSentDAL(string uid, string friend)
         {
             bool sent = false;
 
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
-
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
-
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
-                miComando.CommandText = "SELECT 1 AS 'SENT' FROM USERFRIENDREQUEST WHERE UIDSender = @uid AND UIDReceiver = @friend";
-
-                miLector = miComando.ExecuteReader();
-
-                if (miLector.HasRows)
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    while (miLector.Read())
-                    {
-                        int total = (int)miLector["SENT"];
+                    cmd.CommandText = @"
+                SELECT 1 
+                FROM USERFRIENDREQUEST 
+                WHERE UIDSender = @uid AND UIDReceiver = @friend";
 
-                        sent = total == 1;
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        sent = reader.HasRows;
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return sent;
@@ -1006,28 +828,26 @@ namespace DAL
         /// <param name="uid">UID del emisor</param>
         /// <param name="friend">UID del receptor</param>
         /// <returns>Número de filas afectadas</returns>
-        public static int deleteFriendDAL(String uid, String friend) {
+        public static int deleteFriendDAL(string uid, string friend)
+        {
             int numFilasAfectadas = 0;
-
-            SqlCommand miComando = new SqlCommand();
-            SqlDataReader miLector;
 
             try
             {
-                miComando.Connection = clsConexion.GetConnection();
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@friend", SqlDbType.VarChar).Value = friend;
 
-                miComando.Parameters.Add("@uid", System.Data.SqlDbType.VarChar).Value = uid;
-                miComando.Parameters.Add("@friend", System.Data.SqlDbType.VarChar).Value = friend;
-                miComando.CommandText = "DELETE FROM USERFRIENDS WHERE UID = @uid AND UIDFriend = @friend";
-
-                numFilasAfectadas = miComando.ExecuteNonQuery();
+                    conn.Open();
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-            }
-            finally
-            {
-                clsConexion.Desconectar();
+                throw;
             }
 
             return numFilasAfectadas;
