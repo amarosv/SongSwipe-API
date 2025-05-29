@@ -37,7 +37,7 @@ namespace DAL.Lists
                 paginatedArtists.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
             }
 
-            if (page < result.totalPages)
+            if (page < result.result.totalPages)
             {
                 paginatedArtists.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
             }
@@ -46,7 +46,7 @@ namespace DAL.Lists
             List<Task<Artist>> artistTasks = new List<Task<Artist>>();
 
             // Se añaden las tareas a la lista
-            foreach (long artistId in result.list)
+            foreach (long artistId in result.result.list)
             {
                 // Verificamos si el artista ya está en el cache
                 if (DeezerCache.TryGetArtist(artistId, out Artist cachedArtist))
@@ -71,7 +71,8 @@ namespace DAL.Lists
 
             // Asignar valores al objeto paginado
             paginatedArtists.Page = page;
-            paginatedArtists.TotalPages = result.totalPages;
+            paginatedArtists.TotalPages = result.result.totalPages;
+            paginatedArtists.TotalArtists = result.total;
             paginatedArtists.Offset = offset;
             paginatedArtists.Last = offset + artists.Count - 1;
             paginatedArtists.Limit = limit;

@@ -37,7 +37,7 @@ namespace DAL.Lists
                 paginatedTracks.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
             }
 
-            if (page < result.totalPages)
+            if (page < result.result.totalPages)
             {
                 paginatedTracks.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
             }
@@ -46,7 +46,7 @@ namespace DAL.Lists
             List<Task<Track>> trackTasks = new List<Task<Track>>();
 
             // Se añaden las tareas a la lista
-            foreach (long trackId in result.list)
+            foreach (long trackId in result.result.list)
             {
                 // Verificamos si la canción ya está en el cache
                 if (DeezerCache.TryGetTrack(trackId, out Track cachedTrack))
@@ -71,7 +71,8 @@ namespace DAL.Lists
 
             // Asignar valores al objeto paginado
             paginatedTracks.Page = page;
-            paginatedTracks.TotalPages = result.totalPages;
+            paginatedTracks.TotalPages = result.result.totalPages;
+            paginatedTracks.TotalTracks = result.total;
             paginatedTracks.Offset = offset;
             paginatedTracks.Last = offset + tracks.Count - 1;
             paginatedTracks.Limit = limit;
@@ -103,7 +104,7 @@ namespace DAL.Lists
                 paginatedTracks.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
             }
 
-            if (page < result.totalPages)
+            if (page < result.result.totalPages)
             {
                 paginatedTracks.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
             }
@@ -112,7 +113,7 @@ namespace DAL.Lists
             List<Task<Track>> trackTasks = new List<Task<Track>>();
 
             // Se añaden las tareas a la lista
-            foreach (long trackId in result.list)
+            foreach (long trackId in result.result.list)
             {
                 // Verificamos si la canción ya está en el cache
                 if (DeezerCache.TryGetTrack(trackId, out Track cachedTrack))
@@ -137,7 +138,8 @@ namespace DAL.Lists
 
             // Asignar valores al objeto paginado
             paginatedTracks.Page = page;
-            paginatedTracks.TotalPages = result.totalPages;
+            paginatedTracks.TotalPages = result.result.totalPages;
+            paginatedTracks.TotalTracks = result.total;
             paginatedTracks.Offset = offset;
             paginatedTracks.Last = offset + tracks.Count - 1;
             paginatedTracks.Limit = limit;

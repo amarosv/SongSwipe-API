@@ -38,7 +38,7 @@ namespace DAL.Lists
                 paginatedGenres.LinkPreviousPage = $"{baseUrl}?page={page - 1}&limit={limit}";
             }
 
-            if (page < result.totalPages)
+            if (page < result.result.totalPages)
             {
                 paginatedGenres.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
             }
@@ -47,7 +47,7 @@ namespace DAL.Lists
             List<Task<Genre>> genreTasks = new List<Task<Genre>>();
 
             // Se añaden las tareas a la lista
-            foreach (long genreId in result.list)
+            foreach (long genreId in result.result.list)
             {
                 // Verificamos si el género ya está en el cache
                 if (DeezerCache.TryGetGenre(genreId, out Genre cachedGenre))
@@ -72,7 +72,8 @@ namespace DAL.Lists
 
             // Asignar valores al objeto paginado
             paginatedGenres.Page = page;
-            paginatedGenres.TotalPages = result.totalPages;
+            paginatedGenres.TotalPages = result.result.totalPages;
+            paginatedGenres.TotalGenres = result.total;
             paginatedGenres.Offset = offset;
             paginatedGenres.Last = offset + genres.Count - 1;
             paginatedGenres.Limit = limit;

@@ -14,6 +14,7 @@ namespace DTO
         public String LinkPreviousPage { get; set; }
         public int Page { get; set; }
         public int TotalPages { get; set; }
+        public int TotalGenres { get; set; }
         public int Offset { get; set; }
         public int Last { get; set; }
         public int Limit { get; set; }
@@ -23,12 +24,13 @@ namespace DTO
         #region Constructores
         public PaginatedGenres() { }
 
-        public PaginatedGenres(string linkNextPage, string linkPreviousPage, int page, int totalPages, int offset, int last, int limit, List<Genre> genres)
+        public PaginatedGenres(string linkNextPage, string linkPreviousPage, int page, int totalPages, int totalGenres, int offset, int last, int limit, List<Genre> genres)
         {
             LinkNextPage = linkNextPage;
             LinkPreviousPage = linkPreviousPage;
             Page = page;
             TotalPages = totalPages;
+            TotalGenres = totalGenres;
             Offset = offset;
             Last = last;
             Limit = limit;

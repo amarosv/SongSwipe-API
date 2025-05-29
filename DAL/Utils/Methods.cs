@@ -38,10 +38,11 @@ namespace DAL.Utils
         /// <param name="procedure">Procedure a ejecutar</param>
         /// <param name="uid">UID del usuario</param>
         /// <returns>Lista de ids de canciones/generos/artistas</returns>
-        public static (int totalPages, List<long> list) getListIdsDAL(string procedure, string uid, int page, int limit)
+        public static (int total, (int totalPages, List<long> list) result) getListIdsDAL(string procedure, string uid, int page, int limit)
         {
             List<long> ids = new();
             int totalPages = 0;
+            int totalTracks = 0;
 
             try
             {
@@ -61,6 +62,13 @@ namespace DAL.Utils
                             totalPages = reader.GetInt32(0);
                         }
 
+                        if (reader.NextResult()) {
+                            if (reader.Read())
+                            {
+                                totalTracks = reader.GetInt32(0);
+                            }
+                        }
+
                         if (reader.NextResult())
                         {
                             while (reader.Read())
@@ -76,7 +84,7 @@ namespace DAL.Utils
                 throw;
             }
 
-            return (totalPages, ids);
+            return (totalTracks, (totalPages, ids));
         }
 
     }
