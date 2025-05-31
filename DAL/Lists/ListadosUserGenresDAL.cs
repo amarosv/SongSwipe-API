@@ -66,7 +66,7 @@ namespace DAL.Lists
             // Agregamos los resultados a la lista final y los almacenamos en el cache
             foreach (var genre in genreResults.Where(t => t != null))
             {
-                DeezerCache.AddGenre(genre.Id, genre); // Guardamos el género en el cache
+                DeezerCache.AddGenre(genre.id, genre); // Guardamos el género en el cache
                 genres.Add(genre);
             }
 

@@ -65,7 +65,7 @@ namespace DAL.Lists
             // Agregamos los resultados a la lista final y los almacenamos en el cache
             foreach (var artist in artistResults.Where(t => t != null))
             {
-                DeezerCache.AddArtist(artist.Id, artist); // Guardamos el artista en el cache
+                DeezerCache.AddArtist(artist.id, artist); // Guardamos el artista en el cache
                 artists.Add(artist);
             }
 
@@ -168,7 +168,7 @@ namespace DAL.Lists
             {
                 if (DeezerCache.TryGetArtist(idArtist, out Artist cachedArtist))
                 {
-                    cachedArtist.Likes = likes;
+                    cachedArtist.likes = likes;
                     artists.Add(cachedArtist);
                 }
                 else
@@ -187,7 +187,7 @@ namespace DAL.Lists
                 var task = kvp.Value;
                 if (task.Result != null)
                 {
-                    task.Result.Likes = likesMap[id];
+                    task.Result.likes = likesMap[id];
                     DeezerCache.AddArtist(id, task.Result);
                     artists.Add(task.Result);
                 }
@@ -244,7 +244,7 @@ namespace DAL.Lists
             {
                 if (DeezerCache.TryGetArtist(idArtist, out Artist cachedArtist))
                 {
-                    cachedArtist.Likes = likes;
+                    cachedArtist.likes = likes;
                     artists.Add(cachedArtist);
                 }
                 else
@@ -263,7 +263,7 @@ namespace DAL.Lists
                 var task = kvp.Value;
                 if (task.Result != null)
                 {
-                    task.Result.Likes = likesMap[id];
+                    task.Result.likes = likesMap[id];
                     DeezerCache.AddArtist(id, task.Result);
                     artists.Add(task.Result);
                 }
@@ -320,7 +320,7 @@ namespace DAL.Lists
             {
                 if (DeezerCache.TryGetArtist(idArtist, out Artist cachedArtist))
                 {
-                    cachedArtist.Likes = likes;
+                    cachedArtist.likes = likes;
                     artists.Add(cachedArtist);
                 }
                 else
@@ -339,7 +339,7 @@ namespace DAL.Lists
                 var task = kvp.Value;
                 if (task.Result != null)
                 {
-                    task.Result.Likes = likesMap[id];
+                    task.Result.likes = likesMap[id];
                     DeezerCache.AddArtist(id, task.Result);
                     artists.Add(task.Result);
                 }

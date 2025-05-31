@@ -9,18 +9,20 @@ namespace Entidades
     public class Contributor
     {
         #region Propiedades
-        public long Id { get; set; }
-        public String Name { get; set; }
-        public String Link { get; set; }
-        public String Share { get; set; }
-        public String Picture { get; set; }
-        public String Picture_Small { get; set; }
-        public String Picture_Medium { get; set; }
-        public String Picture_XL { get; set; }
-        public bool Radio { get; set; }
-        public String TrackList { get; set; }
-        public String Type { get; set; }
-        public String Role { get; set; }
+        // El nombre de las variables están en minúsculas para garantizar la compatibilidad con el JSON de Deezer
+
+        public long id { get; set; }
+        public String name { get; set; }
+        public String link { get; set; }
+        public String share { get; set; }
+        public String picture { get; set; }
+        public String picture_small { get; set; }
+        public String picture_medium { get; set; }
+        public String picture_xl { get; set; }
+        public bool radio { get; set; }
+        public String tracklist { get; set; }
+        public String type { get; set; }
+        public String role { get; set; }
         #endregion
 
         #region Constructores
@@ -28,18 +30,18 @@ namespace Entidades
 
         public Contributor(long id, string name, string link, string share, string picture, string picture_Small, string picture_Medium, string picture_XL, bool radio, string trackList, string type, string role)
         {
-            Id = id;
-            Name = name;
-            Link = link;
-            Share = share;
-            Picture = picture;
-            Picture_Small = picture_Small;
-            Picture_Medium = picture_Medium;
-            Picture_XL = picture_XL;
-            Radio = radio;
-            TrackList = trackList;
-            Type = type;
-            Role = role;
+            this.id = id;
+            this.name = name;
+            this.link = link;
+            this.share = share;
+            this.picture = picture;
+            picture_small = picture_Small;
+            picture_medium = picture_Medium;
+            picture_xl = picture_XL;
+            this.radio = radio;
+            tracklist = trackList;
+            this.type = type;
+            this.role = role;
         }
         #endregion
     }

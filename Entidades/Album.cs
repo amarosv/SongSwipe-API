@@ -6,39 +6,42 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
+
     public class Album
     {
         #region Propiedades
-        public long Id { get; set; }
-        public String Title { get; set; }
-        public String UPC {  get; set; }
-        public String Link { get; set; }
-        public String Share { get; set; }
-        public String Cover { get; set; }
-        public String Cover_Small { get; set; }
-        public String Cover_Medium { get; set; }
-        public String Cover_Big { get; set; }
-        public String Cover_XL { get; set; }
-        public String MD5_Image { get; set; }
-        public int Genre_Id { get; set; }
-        public GenresWrapper Genres { get; set; }
-        public String Label { get; set; }
-        public int Nb_Tracks { get; set; }
-        public int Duration { get; set; }
-        public int Fans {  get; set; }
-        public String Release_Date { get; set; }
-        public String Record_Type { get; set; }
-        public bool Available { get; set; }
-        public Album Alternative { get; set; }
-        public String TrackList { get; set; }
-        public bool Explicit_Lyrics { get; set; }
-        public int Explicit_Content_Lyrics { get; set; }
-        public int Explicit_Content_Cover {  get; set; }
-        public List<Contributor> Contributors { get; set; }
-        public Object Fallback {  get; set; }
-        public Artist Artist { get; set; }
-        public TracksWrapper Tracks { get; set; }
-        public int Likes { get; set; }
+        // El nombre de las variables están en minúsculas para garantizar la compatibilidad con el JSON de Deezer
+
+        public long id { get; set; }
+        public String title { get; set; }
+        public String upc {  get; set; }
+        public String link { get; set; }
+        public String share { get; set; }
+        public String cover { get; set; }
+        public String cover_small { get; set; }
+        public String cover_medium { get; set; }
+        public String cover_big { get; set; }
+        public String cover_xl { get; set; }
+        public String md5_image { get; set; }
+        public int genre_id { get; set; }
+        public GenresWrapper genres { get; set; }
+        public String label { get; set; }
+        public int nb_tracks { get; set; }
+        public int duration { get; set; }
+        public int fans {  get; set; }
+        public String release_date { get; set; }
+        public String record_type { get; set; }
+        public bool available { get; set; }
+        public Album alternative { get; set; }
+        public String tracklist { get; set; }
+        public bool explicit_lyrics { get; set; }
+        public int explicit_content_lyrics { get; set; }
+        public int explicit_content_cover {  get; set; }
+        public List<Contributor> contributors { get; set; }
+        public Object fallback {  get; set; }
+        public Artist artist { get; set; }
+        public TracksWrapper tracks { get; set; }
+        public int likes { get; set; }
         #endregion
 
         #region Constructores 
@@ -46,35 +49,35 @@ namespace Entidades
 
         public Album(long id , string title, string uPC, string link, string share, string cover, string coverSmall, string coverMedium, string coverBig, string coverXL, string mD5Image, int genreId, GenresWrapper genres, string label, int nbTracks, int duration, int fans, string releaseDate, string recordType, bool available, Album alternative, string trackList, bool explicitLyrics, int explicitContentLyrics, int explicitContentCover, List<Contributor> contributors, object fallback, Artist artist, TracksWrapper tracks)
         {
-            Id = id;
-            Title = title;
-            UPC = uPC;
-            Link = link;
-            Share = share;
-            Cover = cover;
-            Cover_Small = coverSmall;
-            Cover_Medium = coverMedium;
-            Cover_Big = coverBig;
-            Cover_XL = coverXL;
-            MD5_Image = mD5Image;
-            Genre_Id = genreId;
-            Genres = genres;
-            Label = label;
-            Nb_Tracks = nbTracks;
-            Duration = duration;
-            Fans = fans;
-            Release_Date = releaseDate;
-            Record_Type = recordType;
-            Available = available;
-            Alternative = alternative;
-            TrackList = trackList;
-            Explicit_Lyrics = explicitLyrics;
-            Explicit_Content_Lyrics = explicitContentLyrics;
-            Explicit_Content_Cover = explicitContentCover;
-            Contributors = contributors;
-            Fallback = fallback;
-            Artist = artist;
-            Tracks = tracks;
+            this.id = id;
+            this.title = title;
+            upc = uPC;
+            this.link = link;
+            this.share = share;
+            this.cover = cover;
+            cover_small = coverSmall;
+            cover_medium = coverMedium;
+            cover_big = coverBig;
+            cover_xl = coverXL;
+            md5_image = mD5Image;
+            genre_id = genreId;
+            this.genres = genres;
+            this.label = label;
+            nb_tracks = nbTracks;
+            this.duration = duration;
+            this.fans = fans;
+            release_date = releaseDate;
+            record_type = recordType;
+            this.available = available;
+            this.alternative = alternative;
+            tracklist = trackList;
+            explicit_lyrics = explicitLyrics;
+            explicit_content_lyrics = explicitContentLyrics;
+            explicit_content_cover = explicitContentCover;
+            this.contributors = contributors;
+            this.fallback = fallback;
+            this.artist = artist;
+            this.tracks = tracks;
         }
         #endregion
     }

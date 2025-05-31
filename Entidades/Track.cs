@@ -10,36 +10,38 @@ namespace Entidades
     public class Track
     {
         #region Propiedades
-        public long Id { get; set; }
-        public bool Readable { get; set; }
-        public String Title { get; set; }
-        public String Title_Short { get; set; }
-        public String Title_Version { get; set; }
-        public bool Unseen { get; set; }
-        public String ISRC { get; set; }
-        public String Link { get; set; }
-        public String Share { get; set; }
-        public int Duration { get; set; }
-        public int Track_Position { get; set; }
-        public int Disk_Number { get; set; }
-        public int Rank { get; set; }
-        public String Release_Date { get; set; }
-        public bool Explicit_Lyrics { get; set; }
-        public int Explicit_Content_Lyrics { get; set; }
-        public int Explicit_Content_Cover {  get; set; }
-        public String Preview { get; set; }
-        public float BPM { get; set; }
-        public float Gain { get; set; }
-        public List<String> Available_Countries { get; set; }
-        public Track Alternative { get; set; }
-        public List<Contributor> Contributors { get; set; }
-        public String MD5_Image { get; set; }
-        public String Track_Token { get; set; }
-        public SimpleArtist Artist { get; set; }
-        public SimpleAlbum Album { get; set; }
-        public String Type { get; set; }
+        // El nombre de las variables están en minúsculas para garantizar la compatibilidad con el JSON de Deezer
 
-        public bool Like { get; set; }
+
+        public long id { get; set; }
+        public bool readable { get; set; }
+        public String title { get; set; }
+        public String title_Short { get; set; }
+        public String title_version { get; set; }
+        public bool unseen { get; set; }
+        public String isrc { get; set; }
+        public String link { get; set; }
+        public String share { get; set; }
+        public int duration { get; set; }
+        public int track_position { get; set; }
+        public int disk_number { get; set; }
+        public int rank { get; set; }
+        public String release_date { get; set; }
+        public bool explicit_lyrics { get; set; }
+        public int explicit_content_lyrics { get; set; }
+        public int explicit_content_cover {  get; set; }
+        public String preview { get; set; }
+        public float bpm { get; set; }
+        public float gain { get; set; }
+        public List<String> available_countries { get; set; }
+        public Track alternative { get; set; }
+        public List<Contributor> contributors { get; set; }
+        public String md5_image { get; set; }
+        public String track_token { get; set; }
+        public SimpleArtist artist { get; set; }
+        public SimpleAlbum album { get; set; }
+        public String type { get; set; }
+        public bool like { get; set; }
         #endregion
 
         #region Constructores 
@@ -47,34 +49,34 @@ namespace Entidades
 
         public Track(long id, bool readable, string title, string titleShort, string titleVersion, bool unseen, string iSRC, string link, string share, int duration, int trackPosition, int diskNumber, int rank, string date, bool explicitLyrics, int explicitContentLyrics, int explicitContentCover, string preview, float bPM, float gain, List<String> availableCountries, Track alternative, List<Contributor> contributors, string mD5Image, string trackToken, SimpleArtist artist, SimpleAlbum album, string type)
         {
-            Id = id;
-            Readable = readable;
-            Title = title;
-            Title_Short = titleShort;
-            Title_Version = titleVersion;
-            Unseen = unseen;
-            ISRC = iSRC;
-            Link = link;
-            Share = share;
-            Duration = duration;
-            Track_Position = trackPosition;
-            Disk_Number = diskNumber;
-            Rank = rank;
-            Release_Date = date;
-            Explicit_Lyrics = explicitLyrics;
-            Explicit_Content_Lyrics = explicitContentLyrics;
-            Explicit_Content_Cover = explicitContentCover;
-            Preview = preview;
-            BPM = bPM;
-            Gain = gain;
-            Available_Countries = availableCountries;
-            Alternative = alternative;
-            Contributors = contributors;
-            MD5_Image = mD5Image;
-            Track_Token = trackToken;
-            Artist = artist;
-            Album = album;
-            Type = type;
+            this.id = id;
+            this.readable = readable;
+            this.title = title;
+            title_Short = titleShort;
+            title_version = titleVersion;
+            this.unseen = unseen;
+            isrc = iSRC;
+            this.link = link;
+            this.share = share;
+            this.duration = duration;
+            track_position = trackPosition;
+            disk_number = diskNumber;
+            this.rank = rank;
+            release_date = date;
+            explicit_lyrics = explicitLyrics;
+            explicit_content_lyrics = explicitContentLyrics;
+            explicit_content_cover = explicitContentCover;
+            this.preview = preview;
+            bpm = bPM;
+            this.gain = gain;
+            available_countries = availableCountries;
+            this.alternative = alternative;
+            this.contributors = contributors;
+            md5_image = mD5Image;
+            track_token = trackToken;
+            this.artist = artist;
+            this.album = album;
+            this.type = type;
         }
         #endregion
     }

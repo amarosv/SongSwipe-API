@@ -9,18 +9,20 @@ namespace Entidades
     public class SimpleArtist
     {
         #region Propiedades
-        public long Id { get; set; }
-        public String Name { get; set; }
-        public String Link { get; set; }
-        public String Share {  get; set; }
-        public String Picture { get; set; }
-        public String Picture_Small { get; set; }
-        public String Picture_Medium { get; set; }
-        public String Picture_Big { get; set; }
-        public String Picture_XL { get; set; }
-        public bool Radio { get; set; }
-        public String TrackList { get; set; }
-        public String Type { get; set; }
+        // El nombre de las variables están en minúsculas para garantizar la compatibilidad con el JSON de Deezer
+
+        public long id { get; set; }
+        public String name { get; set; }
+        public String link { get; set; }
+        public String share {  get; set; }
+        public String picture { get; set; }
+        public String picture_small { get; set; }
+        public String picture_medium { get; set; }
+        public String picture_big { get; set; }
+        public String picture_xl { get; set; }
+        public bool radio { get; set; }
+        public String tracklist { get; set; }
+        public String type { get; set; }
         #endregion
     }
 }

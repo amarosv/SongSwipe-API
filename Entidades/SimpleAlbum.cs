@@ -9,18 +9,20 @@ namespace Entidades
     public class SimpleAlbum
     {
         #region Propiedades
-        public long Id { get; set; }
-        public String Title { get; set; }
-        public String Link { get; set; }
-        public String Cover { get; set; }
-        public String Cover_Small { get; set; }
-        public String Cover_Medium { get; set; }
-        public String Cover_Big { get; set; }
-        public String Cover_XL { get; set; }
-        public String MD5_Image { get; set; }
-        public String Release_Date { get; set; }
-        public String TrackList { get; set; }
-        public String Type { get; set; }
+        // El nombre de las variables están en minúsculas para garantizar la compatibilidad con el JSON de Deezer
+
+        public long id { get; set; }
+        public String title { get; set; }
+        public String link { get; set; }
+        public String cover { get; set; }
+        public String cover_small { get; set; }
+        public String cover_medium { get; set; }
+        public String cover_big { get; set; }
+        public String cover_xl { get; set; }
+        public String md5_image { get; set; }
+        public String release_date { get; set; }
+        public String tracklist { get; set; }
+        public String type { get; set; }
         #endregion
     }
 }

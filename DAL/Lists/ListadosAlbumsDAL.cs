@@ -57,7 +57,7 @@ namespace DAL.Lists
             {
                 if (DeezerCache.TryGetAlbum(idAlbum, out Album cachedAlbum))
                 {
-                    cachedAlbum.Likes = likes;
+                    cachedAlbum.likes = likes;
                     albums.Add(cachedAlbum);
                 }
                 else
@@ -76,7 +76,7 @@ namespace DAL.Lists
                 var task = kvp.Value;
                 if (task.Result != null)
                 {
-                    task.Result.Likes = likesMap[id];
+                    task.Result.likes = likesMap[id];
                     DeezerCache.AddAlbum(id, task.Result);
                     albums.Add(task.Result);
                 }
@@ -131,7 +131,7 @@ namespace DAL.Lists
             {
                 if (DeezerCache.TryGetAlbum(idAlbum, out Album cachedAlbum))
                 {
-                    cachedAlbum.Likes = likes;
+                    cachedAlbum.likes = likes;
                     albums.Add(cachedAlbum);
                 }
                 else
@@ -150,7 +150,7 @@ namespace DAL.Lists
                 var task = kvp.Value;
                 if (task.Result != null)
                 {
-                    task.Result.Likes = likesMap[id];
+                    task.Result.likes = likesMap[id];
                     DeezerCache.AddAlbum(id, task.Result);
                     albums.Add(task.Result);
                 }
@@ -205,7 +205,7 @@ namespace DAL.Lists
             {
                 if (DeezerCache.TryGetAlbum(idAlbum, out Album cachedAlbum))
                 {
-                    cachedAlbum.Likes = likes;
+                    cachedAlbum.likes = likes;
                     albums.Add(cachedAlbum);
                 }
                 else
@@ -224,7 +224,7 @@ namespace DAL.Lists
                 var task = kvp.Value;
                 if (task.Result != null)
                 {
-                    task.Result.Likes = likesMap[id];
+                    task.Result.likes = likesMap[id];
                     DeezerCache.AddAlbum(id, task.Result);
                     albums.Add(task.Result);
                 }

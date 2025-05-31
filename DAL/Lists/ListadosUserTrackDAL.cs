@@ -65,7 +65,7 @@ namespace DAL.Lists
             // Agregamos los resultados a la lista final y los almacenamos en el cache
             foreach (var track in trackResults.Where(t => t != null))
             {
-                DeezerCache.AddTrack(track.Id, track); // Guardamos la canción en el cache
+                DeezerCache.AddTrack(track.id, track); // Guardamos la canción en el cache
                 tracks.Add(track);
             }
 
@@ -132,7 +132,7 @@ namespace DAL.Lists
             // Agregamos los resultados a la lista final y los almacenamos en el cache
             foreach (var track in trackResults.Where(t => t != null))
             {
-                DeezerCache.AddTrack(track.Id, track); // Guardamos la canción en el cache
+                DeezerCache.AddTrack(track.id, track); // Guardamos la canción en el cache
                 tracks.Add(track);
             }
 
@@ -196,7 +196,7 @@ namespace DAL.Lists
             {
                 if (DeezerCache.TryGetTrack(idTrack, out Track cachedTrack))
                 {
-                    cachedTrack.Like = swipe;
+                    cachedTrack.like = swipe;
                     tracks.Add(cachedTrack);
                 }
                 else
@@ -215,7 +215,7 @@ namespace DAL.Lists
                 var task = kvp.Value;
                 if (task.Result != null)
                 {
-                    task.Result.Like = swipeMap[id];
+                    task.Result.like = swipeMap[id];
                     DeezerCache.AddTrack(id, task.Result);
                     tracks.Add(task.Result);
                 }
