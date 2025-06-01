@@ -1,4 +1,5 @@
 ﻿using DAL.Methods;
+using DTO;
 using Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -106,6 +107,44 @@ namespace Back.Controllers.API
             catch (Exception ex)
             {
                 salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<Track>/1/stats
+        [HttpGet("{id}/stats")]
+        [SwaggerOperation(
+            Summary = "Obtiene las stats de una canción",
+            Description = "Este método recibe el ID de una canción y obtiene sus stats<br>" +
+            "Si no se encuentra ninguna canción devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Stats obtenidas correctamente", typeof(Stats))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetStatsByTrack(
+            [SwaggerParameter(Description = "ID de la canción")]
+            long id
+        )
+        {
+            IActionResult salida;
+            Stats stats;
+
+            try
+            {
+                stats = MetodosTrackDAL.getStatsByTrack(id);
+                if (stats == null)
+                {
+                    salida = NotFound("No se ha encontrado ninguna canción");
+                }
+                else
+                {
+                    salida = Ok(stats);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
             }
 
             return salida;

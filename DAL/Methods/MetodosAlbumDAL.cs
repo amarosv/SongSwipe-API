@@ -1,9 +1,12 @@
 ﻿using DAL.Utils;
+using DTO;
 using Entidades;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,15 +19,15 @@ namespace DAL.Methods
         /// </summary>
         /// <param name="id">Id del album</param>
         /// <returns>Datos del album</returns>
-        public static async Task<Album> getAlbumById(int id)
-        {
-            if (DeezerCache.TryGetAlbum(id, out Album cachedAlbum))
-            {
-                return cachedAlbum;
-            }
+        //public static async Task<Album> getAlbumById(int id)
+        //{
+        //    if (DeezerCache.TryGetAlbum(id, out Album cachedAlbum))
+        //    {
+        //        return cachedAlbum;
+        //    }
 
-            return await CallApiDeezer.HandleRateLimitAndGetAlbum(id);
-        }
+        //    return await CallApiDeezer.HandleRateLimitAndGetAlbum(id);
+        //}
 
 
         /// <summary>
@@ -98,5 +101,25 @@ namespace DAL.Methods
             return dislikes;
         }
 
+        /// <summary>
+        /// Esta función recibe el ID de un album y devuelve sus stats
+        /// </summary>
+        /// <param name="idAlbum">ID del album</param>
+        /// <returns>Stats</returns>
+        public static Stats getStatsByAlbumDAL(long idAlbum)
+        {
+            Stats stats = new Stats();
+
+            int likes = getLikesByAlbum(idAlbum);
+            int dislikes = getDislikesByAlbum(idAlbum);
+
+            int swipes = likes + dislikes;
+
+            stats.Likes = likes;
+            stats.Dislikes = dislikes;
+            stats.Swipes = swipes;
+
+            return stats;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DAL.Lists;
 using DAL.Methods;
+using DTO;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -106,6 +107,44 @@ namespace Back.Controllers.API
             catch (Exception ex)
             {
                 salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<Album>/1/stats
+        [HttpGet("{id}/stats")]
+        [SwaggerOperation(
+            Summary = "Obtiene las stats de un album",
+            Description = "Este método recibe el ID de un album y obtiene sus stats<br>" +
+            "Si no se encuentra ningún album devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Stats obtenidas correctamente", typeof(Stats))]
+        [SwaggerResponse(404, "No se ha encontrado ningun album")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetStatsByAlbum(
+            [SwaggerParameter(Description = "ID del album")]
+            long id
+        )
+        {
+            IActionResult salida;
+            Stats stats;
+
+            try
+            {
+                stats = MetodosAlbumDAL.getStatsByAlbumDAL(id);
+                if (stats == null)
+                {
+                    salida = NotFound("No se ha encontrado ningún álbum");
+                }
+                else
+                {
+                    salida = Ok(stats);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
             }
 
             return salida;

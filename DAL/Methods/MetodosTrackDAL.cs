@@ -1,4 +1,5 @@
 ﻿using DAL.Utils;
+using DTO;
 using Entidades;
 using Microsoft.Data.SqlClient;
 using System;
@@ -17,22 +18,22 @@ namespace DAL.Methods
         /// </summary>
         /// <param name="id">Id de la canción</param>
         /// <returns>Datos de la canción</returns>
-        public static async Task<Track> getTrackById(int id)
-        {
-            Track track = null;
+        //public static async Task<Track> getTrackById(int id)
+        //{
+        //    Track track = null;
 
-            // Verificamos si la canción ya está en el cache
-            if (DeezerCache.TryGetTrack(id, out Track cachedTrack))
-            {
-                track = cachedTrack;
-            }
-            else
-            {
-                track = await CallApiDeezer.HandleRateLimitAndGetTrack(id);
-            }
+        //    // Verificamos si la canción ya está en el cache
+        //    if (DeezerCache.TryGetTrack(id, out Track cachedTrack))
+        //    {
+        //        track = cachedTrack;
+        //    }
+        //    else
+        //    {
+        //        track = await CallApiDeezer.HandleRateLimitAndGetTrack(id);
+        //    }
 
-            return track;
-        }
+        //    return track;
+        //}
 
         /// <summary>
         /// Esta función recibe el id de una canción y devuelve el número de likes de esta
@@ -104,5 +105,25 @@ namespace DAL.Methods
             return dislikes;
         }
 
+        /// <summary>
+        /// Esta función recibe el ID de un track y devuelve sus stats
+        /// </summary>
+        /// <param name="idTrack">ID del track</param>
+        /// <returns>Stats</returns>
+        public static Stats getStatsByTrack(long idTrack)
+        {
+            Stats stats = new Stats();
+
+            int likes = getLikesByTrack(idTrack);
+            int dislikes = getDislikesByTrack(idTrack);
+
+            int swipes = likes + dislikes;
+
+            stats.Likes = likes;
+            stats.Dislikes = dislikes;
+            stats.Swipes = swipes;
+
+            return stats;
+        }
     }
 }

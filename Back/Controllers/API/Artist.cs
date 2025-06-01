@@ -1,4 +1,6 @@
 ﻿using DAL.Lists;
+using DAL.Methods;
+using DTO;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -105,6 +107,44 @@ namespace Back.Controllers.API
                 else
                 {
                     salida = Ok(artists);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<Artist>/1/stats
+        [HttpGet("{id}/stats")]
+        [SwaggerOperation(
+            Summary = "Obtiene las stats de un artista",
+            Description = "Este método recibe el ID de un artista y obtiene sus stats<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Stats obtenidas correctamente", typeof(Stats))]
+        [SwaggerResponse(404, "No se ha encontrado ningun artista")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetStatsByArtist(
+            [SwaggerParameter(Description = "ID del artista")]
+            long id
+        )
+        {
+            IActionResult salida;
+            Stats stats;
+
+            try
+            {
+                stats = MetodosArtistDAL.getStatsByArtistDAL(id);
+                if (stats == null)
+                {
+                    salida = NotFound("No se ha encontrado ningún artista");
+                }
+                else
+                {
+                    salida = Ok(stats);
                 }
             }
             catch (Exception e)
