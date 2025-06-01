@@ -1690,6 +1690,46 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // PUT api/<User>/5/update_swipe
+        [HttpPut("{uid}/update_swipe")]
+        [SwaggerOperation(
+            Summary = "Obtiene un UID de usuario, el ID de la canción y el nuevo valor del like y lo actualiza en la base de datos",
+            Description = "Este método obtiene un UID de usuario, el ID de la canción y el nuevo valor del like y lo actualiza de la base de datos.<br>" +
+            "Si no se ha podido actualizar devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(404, "No se ha podido actualizar el Swipe")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult PutSwipe(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "Simple Swipe con el nuevo valor del like")]
+            [FromBody] SimpleSwipe simpleSwipe)
+        {
+            IActionResult salida;
+
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserTrackDAL.updateSwipeDAL(uid, simpleSwipe);
+
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound("No se ha podido actualizar el Swipe");
+                }
+                else
+                {
+                    salida = Ok("Swipe actualizado correctamente");
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
 
         // DELETE api/<User>/5
         [HttpDelete("{uid}")]

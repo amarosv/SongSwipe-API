@@ -82,7 +82,7 @@ namespace DAL.Methods
         /// </summary>
         /// <param name="uid">UID del usuario</param>
         /// <param name="swipes">Lista de Swipes</param>
-        /// <returns>Bool que indica si se ha guardado</returns>
+        /// <returns>Número de lineas afectadas</returns>
         public static int saveSwipesDAL(string uid, List<Swipe> swipes)
         {
             int numFilasAfectadas = 0;
@@ -157,5 +157,38 @@ namespace DAL.Methods
 
             return exists;
         }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario, un objeto con el ID de la canción y el nuevo valor del like y lo actualiza en la base de datos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="simpleSwipe">Objeto con el ID de la canción y el nuevo valor del like</param>
+        /// <returns>Número de líneas modificadas</returns>
+        public static int updateSwipeDAL(string uid, SimpleSwipe simpleSwipe)
+        {
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("UPDATE USERSWIPES SET Swipe = @like WHERE UID = @uid AND IDTrack = @idTrack", conn))
+                {
+                    conn.Open();
+
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@like", SqlDbType.Int).Value = simpleSwipe.Like;
+                    cmd.Parameters.Add("@idTrack", SqlDbType.BigInt).Value = simpleSwipe.Id;
+
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return numFilasAfectadas;
+        }
+
     }
 }
