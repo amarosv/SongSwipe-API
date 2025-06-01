@@ -1149,7 +1149,7 @@ namespace Back.Controllers.API
             Description = "Este método recibe un UID y devuelve una lista con los usuarios a los que les ha mandado una solicitu de amistad." +
             "Si no se encuentran solicitudes devuelve un mensaje de error"
         )]
-        [SwaggerResponse(200, "Se ha enviado solicitud", typeof(List<Usuario>))]
+        [SwaggerResponse(200, "Lista de usuarios", typeof(List<Usuario>))]
         [SwaggerResponse(404, "No se han encontrado solicitudes")]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult GetListSentRequests(
@@ -1187,7 +1187,7 @@ namespace Back.Controllers.API
             Description = "Este método recibe un UID y devuelve una lista con los usuarios que le han mandado una solicitu de amistad." +
             "Si no se encuentran solicitudes devuelve un mensaje de error"
         )]
-        [SwaggerResponse(200, "Se ha enviado solicitud", typeof(List<Usuario>))]
+        [SwaggerResponse(200, "Lista de usuarios", typeof(List<Usuario>))]
         [SwaggerResponse(404, "No se han encontrado solicitudes")]
         [SwaggerResponse(500, "Error interno del servidor")]
         public IActionResult GetListReceiveRequests(
@@ -1210,6 +1210,40 @@ namespace Back.Controllers.API
                 {
                     salida = Ok(usuarios);
                 }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/is_track_liked/7
+        [HttpGet("{uid}/is_track_liked/{idTrack}")]
+        [SwaggerOperation(
+            Summary = "Obtiene si la canción está marcada como me gusta",
+            Description = "Este método recibe un UID y un ID de canción y devuelve si el usuario la ha marcado como me gusta." +
+            "Si no se encuentra la canción devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Se ha marcado o no", typeof(bool))]
+        [SwaggerResponse(404, "No se ha encontrado la canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetIsTrackLiked(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "ID de la canción")]
+            long idTrack
+        )
+        {
+            IActionResult salida;
+            bool exists = false;
+
+            try
+            {
+                exists = MetodosUserTrackDAL.isTrackLikedDAL(uid, idTrack);
+
+                salida = Ok(exists);
             }
             catch (Exception e)
             {

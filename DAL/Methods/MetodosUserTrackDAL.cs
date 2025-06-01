@@ -1,9 +1,12 @@
 ﻿using DAL.Utils;
 using DTO;
+using Entidades;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -124,6 +127,35 @@ namespace DAL.Methods
 
             return numFilasAfectadas;
         }
+        
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y el id de una canción y devuelve si el usuario la ha marcado como me gusta
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="idTrack">ID de la canción</param>
+        /// <returns>Booleano que indica si se ha marcado como me gusta</returns>
+        public static bool isTrackLikedDAL(String uid, long idTrack)
+        {
+            bool exists = false;
 
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("SELECT 1 FROM USERSWIPES WHERE IDTrack = @IDTrack AND Swipe = 1 AND UID = @uid", conn))
+                {
+                    cmd.Parameters.Add("@IDTrack", SqlDbType.BigInt).Value = idTrack;
+                    cmd.Parameters.Add("@UID", SqlDbType.VarChar).Value = uid;
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        exists = reader.HasRows;
+                    }
+                }
+            }
+            catch (Exception) { throw; }
+
+            return exists;
+        }
     }
 }
