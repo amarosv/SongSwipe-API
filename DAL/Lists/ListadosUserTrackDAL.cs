@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace DAL.Lists
 {
@@ -42,8 +43,12 @@ namespace DAL.Lists
                 paginatedTracks.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
             }
 
+            // Diccionario para mantener la relación ID -> Track
+            Dictionary<long, Track> trackDict = new Dictionary<long, Track>();
+            List<long> trackOrder = result.result.list;
+
             // Crear una lista de tareas para manejar las peticiones de forma concurrente
-            List<Task<Track>> trackTasks = new List<Task<Track>>();
+            List<Task<(long id, Track track)>> trackTasks = new List<Task<(long, Track)>>();
 
             // Se añaden las tareas a la lista
             foreach (long trackId in result.result.list)
@@ -51,23 +56,36 @@ namespace DAL.Lists
                 // Verificamos si la canción ya está en el cache
                 if (DeezerCache.TryGetTrack(trackId, out Track cachedTrack))
                 {
-                    tracks.Add(cachedTrack); // Si está en el cache, lo agregamos directamente
+                    trackDict[trackId] = cachedTrack;
                 }
                 else
                 {
-                    trackTasks.Add(CallApiDeezer.HandleRateLimitAndGetTrack(trackId)); // Si no está, la solicitamos
+                    trackTasks.Add(Task.Run(async () =>
+                    {
+                        var track = await CallApiDeezer.HandleRateLimitAndGetTrack(trackId);
+                        return (trackId, track);
+                    }));
                 }
             }
 
             // Esperamos que todas las tareas se completen
-            var trackResults = await Task.WhenAll(trackTasks);
+            var fetchedTracks = await Task.WhenAll(trackTasks);
 
             // Agregamos los resultados a la lista final y los almacenamos en el cache
-            foreach (var track in trackResults.Where(t => t != null))
+            foreach (var (id, track) in fetchedTracks)
             {
-                DeezerCache.AddTrack(track.id, track); // Guardamos la canción en el cache
-                tracks.Add(track);
+                if (track != null)
+                {
+                    DeezerCache.AddTrack(id, track);
+                    trackDict[id] = track;
+                }
             }
+
+            // Finalmente reconstruimos la lista en el orden original
+            tracks = trackOrder
+                .Where(id => trackDict.ContainsKey(id))
+                .Select(id => trackDict[id])
+                .ToList();
 
             // Asignar valores al objeto paginado
             paginatedTracks.Page = page;
@@ -109,8 +127,12 @@ namespace DAL.Lists
                 paginatedTracks.LinkNextPage = $"{baseUrl}?page={page + 1}&limit={limit}";
             }
 
+            // Diccionario para mantener la relación ID -> Track
+            Dictionary<long, Track> trackDict = new Dictionary<long, Track>();
+            List<long> trackOrder = result.result.list;
+
             // Crear una lista de tareas para manejar las peticiones de forma concurrente
-            List<Task<Track>> trackTasks = new List<Task<Track>>();
+            List<Task<(long id, Track track)>> trackTasks = new List<Task<(long, Track)>>();
 
             // Se añaden las tareas a la lista
             foreach (long trackId in result.result.list)
@@ -118,23 +140,36 @@ namespace DAL.Lists
                 // Verificamos si la canción ya está en el cache
                 if (DeezerCache.TryGetTrack(trackId, out Track cachedTrack))
                 {
-                    tracks.Add(cachedTrack); // Si está en el cache, lo agregamos directamente
+                    trackDict[trackId] = cachedTrack;
                 }
                 else
                 {
-                    trackTasks.Add(CallApiDeezer.HandleRateLimitAndGetTrack(trackId)); // Si no está, la solicitamos
+                    trackTasks.Add(Task.Run(async () =>
+                    {
+                        var track = await CallApiDeezer.HandleRateLimitAndGetTrack(trackId);
+                        return (trackId, track);
+                    }));
                 }
             }
 
             // Esperamos que todas las tareas se completen
-            var trackResults = await Task.WhenAll(trackTasks);
+            var fetchedTracks = await Task.WhenAll(trackTasks);
 
             // Agregamos los resultados a la lista final y los almacenamos en el cache
-            foreach (var track in trackResults.Where(t => t != null))
+            foreach (var (id, track) in fetchedTracks)
             {
-                DeezerCache.AddTrack(track.id, track); // Guardamos la canción en el cache
-                tracks.Add(track);
+                if (track != null)
+                {
+                    DeezerCache.AddTrack(id, track);
+                    trackDict[id] = track;
+                }
             }
+
+            // Finalmente reconstruimos la lista en el orden original
+            tracks = trackOrder
+                .Where(id => trackDict.ContainsKey(id))
+                .Select(id => trackDict[id])
+                .ToList();
 
             // Asignar valores al objeto paginado
             paginatedTracks.Page = page;

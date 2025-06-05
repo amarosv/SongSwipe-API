@@ -1,4 +1,5 @@
-﻿using DAL.Methods;
+﻿using DAL.Lists;
+using DAL.Methods;
 using DTO;
 using Entidades;
 using Microsoft.AspNetCore.Mvc;
@@ -133,6 +134,43 @@ namespace Back.Controllers.API
             try
             {
                 stats = MetodosTrackDAL.getStatsByTrack(id);
+                if (stats == null)
+                {
+                    salida = NotFound("No se ha encontrado ninguna canción");
+                }
+                else
+                {
+                    salida = Ok(stats);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // Post api/<Track>/stats
+        [HttpPost("stats")]
+        [SwaggerOperation(
+            Summary = "Obtiene las stats de una lista de canciones",
+            Description = "Este método recibe una lisa con el ID de las canciones y obtiene sus stats<br>" +
+            "Si no se encuentra ninguna canción devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Stats obtenidas correctamente", typeof(Stats))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetTracksStats(
+            [SwaggerParameter(Description = "IDs de las canciones")]
+            [FromBody] List<long> idTracks)
+        {
+            IActionResult salida;
+            Dictionary<long, Stats> stats;
+
+            try
+            {
+                stats = ListadosTrackDAL.getTracksStatsDAL(idTracks);
                 if (stats == null)
                 {
                     salida = NotFound("No se ha encontrado ninguna canción");
