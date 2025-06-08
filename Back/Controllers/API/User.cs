@@ -1253,6 +1253,40 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/is_artist_favorite/7
+        [HttpGet("{uid}/is_artist_favorite/{idArtist}")]
+        [SwaggerOperation(
+            Summary = "Obtiene si el artista está marcado como favorito",
+            Description = "Este método recibe un UID y un ID de un artista y devuelve si el usuario la ha marcado como favorito." +
+            "Si no se encuentra el artista devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Se ha marcado o no", typeof(bool))]
+        [SwaggerResponse(404, "No se ha encontrado al artista")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetIsArtistFavorite(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "ID del artista")]
+            long idArtist
+        )
+        {
+            IActionResult salida;
+            bool exists = false;
+
+            try
+            {
+                exists = MetodosUserArtistDAL.isArtistFavorite(uid, idArtist);
+
+                salida = Ok(exists);
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>/5/tracks_not_saved
         [HttpPost("{uid}/tracks_not_saved")]
         [SwaggerOperation(

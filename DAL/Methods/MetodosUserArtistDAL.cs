@@ -44,6 +44,34 @@ namespace DAL.Methods
             return numFilasAfectadas;
         }
 
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y el id de un artista y devuelve si el usuario lo ha marcado como favorito
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="idArtist">ID del artista</param>
+        /// <returns>Lo ha marcado como favorito o no</returns>
+        public static bool isArtistFavorite(string uid, long idArtist)
+        {
+            bool isFavorite = false;
 
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("SELECT 1 FROM USERARTISTS WHERE UID = @uid AND IDArtist = @IDArtist", conn))
+                {
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@IDArtist", SqlDbType.BigInt).Value = idArtist;
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        isFavorite = reader.HasRows;
+                    }
+                }
+            }
+            catch (Exception) { throw; }
+
+            return isFavorite;
+        }
     }
 }
