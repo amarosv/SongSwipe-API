@@ -73,5 +73,32 @@ namespace DAL.Methods
 
             return isFavorite;
         }
+    
+        /// <summary>
+        /// Esta función recibe el uid de un usuario y el id de un artista y lo elimina de sus favoritos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="idArtist">ID del artista</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int deleteArtistFromFavoritesDAL(string uid, long idArtist)
+        {
+            int numFilas = 0;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("DELETE FROM USERARTISTS WHERE UID = @uid AND IDArtist = @idArtist", conn))
+                {
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@idArtist", SqlDbType.BigInt).Value = idArtist;
+                    conn.Open();
+
+                    numFilas = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception) { throw; }
+
+            return numFilas;
+        } 
     }
 }

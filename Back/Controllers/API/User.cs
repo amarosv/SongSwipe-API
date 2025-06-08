@@ -1802,5 +1802,38 @@ namespace Back.Controllers.API
 
             return salida;
         }
+
+        // DELETE api/<User>/5/artist/3
+        [HttpDelete("{uid}/artist/{idArtist}")]
+        [SwaggerOperation(
+            Summary = "Obtiene un UID de usuario y el ID de un artista y lo elimina de la sus favoritos",
+            Description = "Este método obtiene un UID de usuario y el ID de un artista y lo borra de sus favoritos.<br>" +
+            "Si no se encuentra ningún usuario devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(404, "No se ha podido eliminar al artista")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult DeleteArtist(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "ID del artista a eliminar de sus favoritos")]
+            long idArtist
+        )
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserArtistDAL.deleteArtistFromFavoritesDAL(uid, idArtist);
+                salida = Ok(numFilasAfectadas);
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
     }
 }
