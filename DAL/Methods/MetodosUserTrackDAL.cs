@@ -171,11 +171,12 @@ namespace DAL.Methods
             try
             {
                 using (SqlConnection conn = clsConexion.GetConnection())
-                using (SqlCommand cmd = new SqlCommand("UPDATE USERSWIPES SET Swipe = @like WHERE UID = @uid AND IDTrack = @idTrack", conn))
+                using (SqlCommand cmd = new SqlCommand("UPDATE USERSWIPES SET Swipe = @like, DateSwipe = @date WHERE UID = @uid AND IDTrack = @idTrack", conn))
                 {
                     conn.Open();
 
                     cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@date", SqlDbType.DateTime).Value = DateTime.Now;
                     cmd.Parameters.Add("@like", SqlDbType.Int).Value = simpleSwipe.Like;
                     cmd.Parameters.Add("@idTrack", SqlDbType.BigInt).Value = simpleSwipe.Id;
 
