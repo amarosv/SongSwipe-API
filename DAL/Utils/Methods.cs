@@ -87,5 +87,42 @@ namespace DAL.Utils
             return (totalTracks, (totalPages, ids));
         }
 
+        /// <summary>
+        /// Esta función obtiene los ids de las canciones/generos/artistas de la base de datos
+        /// y los devuelve como una lista simple
+        /// </summary>
+        /// <param name="procedure">Procedure a ejecutar</param>
+        /// <param name="id">ID del artista/album/canción</param>
+        /// <returns>Lista de ids de canciones/generos/artistas</returns>
+        public static List<long> getListIdsSimpleDAL(string procedure, long id)
+        {
+            List<long> ids = new();
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = procedure;
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ids.Add((long)reader["ID"]);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return ids;
+        }
+
     }
 }

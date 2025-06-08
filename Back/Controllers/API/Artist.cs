@@ -1,7 +1,9 @@
 ﻿using DAL.Lists;
 using DAL.Methods;
 using DTO;
+using Entidades;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -186,5 +188,81 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<Artist>/1/top_tracks
+        [HttpGet("{id}/top_tracks")]
+        [SwaggerOperation(
+            Summary = "Obtiene el top 3 canciones del artista",
+            Description = "Este método recibe el ID de un artista y obtiene el top 3 canciones <br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Canciones obtenidas correctamente", typeof(List<Entidades.Track>))]
+        [SwaggerResponse(404, "No se ha encontrado ninguna canción")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTopTracksByArtist(
+            [SwaggerParameter(Description = "ID del artista")]
+            long id
+        )
+        {
+            IActionResult salida;
+            List<Entidades.Track> tracks;
+
+            try
+            {
+                tracks = await ListadosArtistsDAL.getTopTracksDAL(id);
+
+                if (tracks.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se ha encontrado ninguna canción");
+                } else
+                {
+                    salida = Ok(tracks);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<Artist>/1/top_albums
+        [HttpGet("{id}/top_albums")]
+        [SwaggerOperation(
+            Summary = "Obtiene el top 3 albumes del artista",
+            Description = "Este método recibe el ID de un artista y obtiene el top 3 albumes <br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Albumes obtenidos correctamente", typeof(List<Entidades.Album>))]
+        [SwaggerResponse(404, "No se ha encontrado ningún album")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public async Task<IActionResult> GetTopAlbumsByArtist(
+            [SwaggerParameter(Description = "ID del artista")]
+            long id
+        )
+        {
+            IActionResult salida;
+            List<Entidades.Album> albums;
+
+            try
+            {
+                albums = await ListadosArtistsDAL.getTopAlbumsDAL(id);
+
+                if (albums.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se ha encontrado ningún album");
+                }
+                else
+                {
+                    salida = Ok(albums);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
     }
 }

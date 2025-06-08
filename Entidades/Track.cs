@@ -42,6 +42,7 @@ namespace Entidades
         public SimpleAlbum album { get; set; }
         public String type { get; set; }
         public bool like { get; set; }
+        public int likes { get; set; }
         #endregion
 
         #region Constructores 
