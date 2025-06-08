@@ -155,5 +155,36 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<Artist>/1/saved_tracks
+        [HttpGet("{id}/saved_tracks")]
+        [SwaggerOperation(
+            Summary = "Obtiene el número de canciones guardadas de un artista",
+            Description = "Este método recibe el ID de un artista y obtiene el número de canciones guardadas (tanto como me gusta como no me gusta)<br>" +
+            "Si no se encuentra ningún artista devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Número de canciones guardadas obtenido correctamente", typeof(int))]
+        [SwaggerResponse(404, "No se ha encontrado ningun artista")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetSavedTracksByArtist(
+            [SwaggerParameter(Description = "ID del artista")]
+            long id
+        )
+        {
+            IActionResult salida;
+            int total;
+
+            try
+            {
+                total = MetodosArtistDAL.getSavedSongsByArtistDAL(id);
+                salida = Ok(total);
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
     }
 }

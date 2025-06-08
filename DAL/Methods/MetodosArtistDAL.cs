@@ -119,5 +119,38 @@ namespace DAL.Methods
 
             return stats;
         }
+
+        /// <summary>
+        /// Esta función recibe el ID de un artista y devuelve el número de canciones guardadas (como me gusta y como no me gusta)
+        /// </summary>
+        /// <param name="idArtist">ID del artista</param>
+        /// <returns>Número de canciones guardadas</returns>
+        public static int getSavedSongsByArtistDAL(long idArtist) {
+            int total = 0;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) AS TOTAL FROM USERSWIPES WHERE IDArtist = @IDArtist", conn))
+                {
+                    cmd.Parameters.Add("@IDArtist", SqlDbType.BigInt).Value = idArtist;
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                total = (int)reader["TOTAL"];
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception) { throw; }
+
+            return total;
+        }
     }
 }
