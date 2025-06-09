@@ -53,5 +53,19 @@ namespace Back.Controllers.API
 
             return Ok(content);
         }
+
+        [HttpGet("client_id")]
+        [SwaggerOperation(
+            Summary = "Devuelve el client ID de Spotify",
+            Description = "Este método devuelve el client ID de Spotify"
+        )]
+        [SwaggerResponse(200, "CLient ID", typeof(String))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetClientID()  
+        {
+            var clientId = _configuration["Spotify:ClientId"];
+
+            return Ok(clientId);
+        }
     }
 }
