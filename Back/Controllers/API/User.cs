@@ -1287,6 +1287,122 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/liked_ids
+        [HttpGet("{uid}/liked_ids")]
+        [SwaggerOperation(
+            Summary = "Devuelve la lista de IDs de las canciones que le han gustado",
+            Description = "Este método recibe un UID y devuelve la lista de IDs de las canciones que le han gustado." +
+            "Si no se encuentra canciones devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Lista de IDs", typeof(List<long>))]
+        [SwaggerResponse(404, "No se han encontrado canciones")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetLikedIDs(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<long> ids = [];
+
+            try
+            {
+                ids = ListadosUserDAL.getLikedTracksIdsDAL(uid);
+
+                if (ids.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se han encontrado canciones");
+                } else
+                {
+                    salida = Ok(ids);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/disliked_ids
+        [HttpGet("{uid}/disliked_ids")]
+        [SwaggerOperation(
+            Summary = "Devuelve la lista de IDs de las canciones que no le han gustado",
+            Description = "Este método recibe un UID y devuelve la lista de IDs de las canciones que no le han gustado." +
+            "Si no se encuentra canciones devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Lista de IDs", typeof(List<long>))]
+        [SwaggerResponse(404, "No se han encontrado canciones")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetDislikedIDs(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<long> ids = [];
+
+            try
+            {
+                ids = ListadosUserDAL.getDislikedTracksIdsDAL(uid);
+
+                if (ids.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se han encontrado canciones");
+                }
+                else
+                {
+                    salida = Ok(ids);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/disliked_ids
+        [HttpGet("{uid}/disliked_ids")]
+        [SwaggerOperation(
+            Summary = "Devuelve la lista de IDs de las canciones que ha swipeado",
+            Description = "Este método recibe un UID y devuelve la lista de IDs de las canciones que ha swipeado." +
+            "Si no se encuentra canciones devuelve un mensaje de error"
+        )]
+        [SwaggerResponse(200, "Lista de IDs", typeof(List<long>))]
+        [SwaggerResponse(404, "No se han encontrado canciones")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetSwipedIDs(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<long> ids = [];
+
+            try
+            {
+                ids = ListadosUserDAL.getSwipedTracksIdsDAL(uid);
+
+                if (ids.IsNullOrEmpty())
+                {
+                    salida = NotFound("No se han encontrado canciones");
+                }
+                else
+                {
+                    salida = Ok(ids);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>/5/tracks_not_saved
         [HttpPost("{uid}/tracks_not_saved")]
         [SwaggerOperation(

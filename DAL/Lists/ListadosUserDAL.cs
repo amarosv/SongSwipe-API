@@ -354,5 +354,115 @@ namespace DAL.Lists
 
             return usuarios;
         }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y devuelve todos los IDs de las canciones que le han gustado
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de IDs</returns>
+        public static List<long> getLikedTracksIdsDAL(string uid) {
+            List<long> ids = [];
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT IDTrack FROM USERSWIPES WHERE UID = @uid AND Swipe = 1";
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            long id = (long)reader["IDTrack"];
+                            
+                            ids.Add(id);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return ids;
+        }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y devuelve todos los IDs de las canciones que no le han gustado
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de IDs</returns>
+        public static List<long> getDislikedTracksIdsDAL(string uid)
+        {
+            List<long> ids = [];
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT IDTrack FROM USERSWIPES WHERE UID = @uid AND Swipe = 0";
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            long id = (long)reader["IDTrack"];
+
+                            ids.Add(id);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return ids;
+        }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y devuelve todos los IDs de las canciones que ha swipeado
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de IDs</returns>
+        public static List<long> getSwipedTracksIdsDAL(string uid)
+        {
+            List<long> ids = [];
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT IDTrack FROM USERSWIPES WHERE UID = @uid";
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            long id = (long)reader["IDTrack"];
+
+                            ids.Add(id);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return ids;
+        }
     }
 }
