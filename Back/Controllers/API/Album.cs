@@ -64,7 +64,10 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Likes del álbum", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult GetLikesAlbum(int id)
+        public IActionResult GetLikesAlbum(
+            [SwaggerParameter(Description = "ID del album")]
+            long id
+        )
         {
             IActionResult salida;
 
@@ -92,7 +95,10 @@ namespace Back.Controllers.API
         )]
         [SwaggerResponse(200, "Dislikes del álbum", typeof(int))]
         [SwaggerResponse(500, "Error interno del servidor")]
-        public IActionResult GetDislikesAlbum(int id)
+        public IActionResult GetDislikesAlbum(
+            [SwaggerParameter(Description = "ID del album")]
+            long id
+        )
         {
             IActionResult salida;
 
