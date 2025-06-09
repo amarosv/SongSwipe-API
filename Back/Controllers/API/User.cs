@@ -1364,8 +1364,8 @@ namespace Back.Controllers.API
             return salida;
         }
 
-        // GET api/<User>/5/disliked_ids
-        [HttpGet("{uid}/disliked_ids")]
+        // GET api/<User>/5/swiped_ids
+        [HttpGet("{uid}/swiped_ids")]
         [SwaggerOperation(
             Summary = "Devuelve la lista de IDs de las canciones que ha swipeado",
             Description = "Este método recibe un UID y devuelve la lista de IDs de las canciones que ha swipeado." +
