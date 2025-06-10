@@ -110,7 +110,7 @@ namespace DAL.Lists
         /// <returns>Lista de usuarios</returns>
         public static List<Usuario> getFriendsDAL(string uid)
         {
-            var usuarios = new List<Usuario>();
+            List<Usuario> usuarios = new List<Usuario>();
 
             try
             {
@@ -463,6 +463,75 @@ namespace DAL.Lists
             }
 
             return ids;
+        }
+        
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y devuelve sus seguidores
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getFollowersDAL(string uid) {
+            List<Usuario> usuarios = new List<Usuario>();
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UID WHERE UF.UIDFriend = @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Utils.Methods.mapUsuarioFromReader(reader));
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return usuarios;
+        }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y devuelve sus seguidos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Lista de usuarios</returns>
+        public static List<Usuario> getFollowigDAL(string uid)
+        {
+            List<Usuario> usuarios = new List<Usuario>();
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UID WHERE UF.UID = @UID";
+                    cmd.Parameters.AddWithValue("@UID", uid);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            usuarios.Add(Utils.Methods.mapUsuarioFromReader(reader));
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return usuarios;
         }
     }
 }

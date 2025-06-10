@@ -1403,6 +1403,66 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/5/followers
+        [HttpGet("{uid}/followers")]
+        [SwaggerOperation(
+            Summary = "Devuelve la lista de los seguidores del usuario",
+            Description = "Este método recibe un UID y devuelve la lista de los seguidores del usuario"
+        )]
+        [SwaggerResponse(200, "Lista de Usuarios", typeof(List<Usuario>))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetFollowers(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<Usuario> users = [];
+
+            try
+            {
+                users = ListadosUserDAL.getFollowersDAL(uid);
+
+                salida = Ok(users);
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // GET api/<User>/5/following
+        [HttpGet("{uid}/following")]
+        [SwaggerOperation(
+            Summary = "Devuelve la lista de los seguidos del usuario",
+            Description = "Este método recibe un UID y devuelve la lista de los seguidos del usuario"
+        )]
+        [SwaggerResponse(200, "Lista de Usuarios", typeof(List<Usuario>))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetFollowing(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid
+        )
+        {
+            IActionResult salida;
+            List<Usuario> users = [];
+
+            try
+            {
+                users = ListadosUserDAL.getFollowigDAL(uid);
+
+                salida = Ok(users);
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // POST api/<User>/5/tracks_not_saved
         [HttpPost("{uid}/tracks_not_saved")]
         [SwaggerOperation(
