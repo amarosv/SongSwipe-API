@@ -513,7 +513,7 @@ namespace DAL.Lists
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UID WHERE UF.UID = @UID";
+                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UIDFriend WHERE UF.UID = @UID";
                     cmd.Parameters.AddWithValue("@UID", uid);
 
                     conn.Open();
