@@ -478,7 +478,7 @@ namespace DAL.Lists
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UID WHERE UF.UIDFriend = @UID";
+                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UID WHERE UF.UIDFriend = @UID AND UF.UserDeleted = 0 AND UF.UserBlocked = 0";
                     cmd.Parameters.AddWithValue("@UID", uid);
 
                     conn.Open();
@@ -513,7 +513,7 @@ namespace DAL.Lists
                 using (SqlConnection conn = clsConexion.GetConnection())
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UIDFriend WHERE UF.UID = @UID";
+                    cmd.CommandText = "SELECT U.* FROM USERFRIENDS UF INNER JOIN USERS U ON U.UID = UF.UIDFriend WHERE UF.UID = @UID AND UF.UserDeleted = 0 AND UF.UserBlocked = 0";
                     cmd.Parameters.AddWithValue("@UID", uid);
 
                     conn.Open();

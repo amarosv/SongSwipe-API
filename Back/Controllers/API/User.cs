@@ -1817,6 +1817,34 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // POST api/<User>/5/accept_all_requests
+        [HttpPost("{uid}/accept_all_requests")]
+        [SwaggerOperation(
+            Summary = "Obtiene el UID de un usuario y acepta todas sus solicitudes de amistad entrantes",
+            Description = "Este método obtiene un UID de un usuario y acepta todas sus solicitudes de amistad entrantes"
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(void))]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult AcceptAllRequests(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid)
+        {
+            IActionResult salida;
+
+            try
+            {
+                MetodosUserDAL.acceptAllRequestsDAL(uid);
+
+                salida = Ok();
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // PUT api/<User>/5
         [HttpPut("{uid}")]
         [SwaggerOperation(
@@ -1941,6 +1969,45 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // PUT api/<User>/5/reactivate_account
+        [HttpPut("{uid}/reactivate_account")]
+        [SwaggerOperation(
+            Summary = "Obtiene un UID de usuario y reactiva su cuenta eliminada",
+            Description = "Este método obtiene un UID de usuario y reactiva su cuenta eliminada<br>" +
+            "Si no se ha podido actualizar devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(404, "No se ha podido actualizar el Swipe")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult ReactivateAccount(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid)
+        {
+            IActionResult salida;
+
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserDAL.reactivateAccountDAL(uid);
+
+                if (numFilasAfectadas == 0)
+                {
+                    salida = NotFound(numFilasAfectadas);
+                }
+                else
+                {
+                    salida = Ok(numFilasAfectadas);
+                }
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
         // DELETE api/<User>/5
         [HttpDelete("{uid}")]
         [SwaggerOperation(
@@ -2002,6 +2069,39 @@ namespace Back.Controllers.API
             try
             {
                 numFilasAfectadas = MetodosUserArtistDAL.deleteArtistFromFavoritesDAL(uid, idArtist);
+                salida = Ok(numFilasAfectadas);
+            }
+            catch (Exception e)
+            {
+                salida = BadRequest(e.Message);
+            }
+
+            return salida;
+        }
+
+        // DELETE api/<User>/5/genre/3
+        [HttpDelete("{uid}/genre/{idGenre}")]
+        [SwaggerOperation(
+            Summary = "Obtiene un UID de usuario y el ID de un género y lo elimina de la sus favoritos",
+            Description = "Este método obtiene un UID de usuario y el ID de un género y lo borra de sus favoritos.<br>" +
+            "Si no se encuentra ningún usuario devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Número de filas afectadas", typeof(int))]
+        [SwaggerResponse(404, "No se ha podido eliminar el género")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult DeleteGenre(
+            [SwaggerParameter(Description = "UID del usuario")]
+            String uid,
+            [SwaggerParameter(Description = "ID del género a eliminar de sus favoritos")]
+            long idGenre
+        )
+        {
+            IActionResult salida;
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                numFilasAfectadas = MetodosUserGenresDAL.deleteGenreFromFavoritesDAL(uid, idGenre);
                 salida = Ok(numFilasAfectadas);
             }
             catch (Exception e)

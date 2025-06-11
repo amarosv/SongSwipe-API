@@ -622,6 +622,26 @@ namespace DAL.Methods
         }
 
         /// <summary>
+        /// Esta función recibe el UID y aceota todas sus solicitudes de amistad recibidas
+        /// </summary>
+        /// <param name="uid"></param>
+        public static void acceptAllRequestsDAL(string uid)
+        {
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("EXEC AcceptAllFriendRequests @UID", conn))
+                {
+                    conn.Open();
+
+                    cmd.Parameters.AddWithValue("@UID", uid);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception) { throw; }
+        }
+
+        /// <summary>
         /// Esta función recibe dos UIDs y comprueba si ya se le ha enviado una solicitud de amistad
         /// </summary>
         /// <param name="uid">UID del emisor</param>
@@ -686,6 +706,30 @@ namespace DAL.Methods
             {
                 throw;
             }
+
+            return numFilasAfectadas;
+        }
+
+        /// <summary>
+        /// Esta función recibe el UID de un usuario y reactiva su cuenta eliminada
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int reactivateAccountDAL(string uid) {
+            int numFilasAfectadas = 0;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("EXEC ReactivateUserAccount @uid", conn))
+                {
+                    conn.Open();
+
+                    cmd.Parameters.AddWithValue("@uid", uid);
+                    numFilasAfectadas = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception) { throw; }
 
             return numFilasAfectadas;
         }

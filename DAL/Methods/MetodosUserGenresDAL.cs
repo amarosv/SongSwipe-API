@@ -43,6 +43,33 @@ namespace DAL.Methods
 
             return numFilasAfectadas;
         }
+        
+        /// <summary>
+        /// Este método recibe el UID de un usuario y el ID de un género y lo elimina de la base de datos
+        /// </summary>
+        /// <param name="uid">UID del usuario</param>
+        /// <param name="idGenre">ID del género</param>
+        /// <returns>Número de filas afectadas</returns>
+        public static int deleteGenreFromFavoritesDAL(string uid, long idGenre)
+        {
+            int numFilas = 0;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("DELETE FROM USERGENRES WHERE UID = @uid AND IDGenre = @idGenre", conn))
+                {
+                    cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
+                    cmd.Parameters.Add("@idGenre", SqlDbType.BigInt).Value = idGenre;
+                    conn.Open();
+
+                    numFilas = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception) { throw; }
+
+            return numFilas;
+        }
 
     }
 }
