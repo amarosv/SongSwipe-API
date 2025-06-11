@@ -20,59 +20,183 @@ namespace DAL.Utils
 
         public static async Task<Track> HandleRateLimitAndGetTrack(long trackId)
         {
-            await HandleRateLimit();
+            int maxRetries = 3;
+            int retries = 0;
 
-            var response = await _httpClient.GetAsync($"{DeezerApiUrl}/track/{trackId}");
-            if (response.IsSuccessStatusCode)
+            while (retries < maxRetries)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                Track trackData = JsonConvert.DeserializeObject<Track>(content);
-                return trackData;
+                await HandleRateLimit(); // Asegura la lógica preventiva
+
+                var response = await _httpClient.GetAsync($"{DeezerApiUrl}/track/{trackId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<Track>(content);
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    retries++;
+
+                    // Intenta leer el tiempo de espera recomendado por la API
+                    if (response.Headers.TryGetValues("Retry-After", out var values))
+                    {
+                        if (int.TryParse(values.FirstOrDefault(), out int secondsToWait))
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(secondsToWait));
+                        }
+                        else
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(5)); // fallback si no se puede parsear
+                        }
+                    }
+                    else
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5)); // fallback si no hay cabecera
+                    }
+                }
+                else
+                {
+                    // Si no es éxito ni 429, rompe el bucle para no repetir en errores permanentes (404, 500, etc.)
+                    break;
+                }
             }
+
             return null;
         }
+
 
         public static async Task<Album> HandleRateLimitAndGetAlbum(long albumId)
         {
-            await HandleRateLimit();
+            int maxRetries = 3;
+            int retries = 0;
 
-            var response = await _httpClient.GetAsync($"{DeezerApiUrl}/album/{albumId}");
-            if (response.IsSuccessStatusCode)
+            while (retries < maxRetries)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                Album albumData = JsonConvert.DeserializeObject<Album>(content);
-                return albumData;
+                await HandleRateLimit(); // Precaución adicional si tienes control de cuota
+
+                var response = await _httpClient.GetAsync($"{DeezerApiUrl}/album/{albumId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<Album>(content);
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    retries++;
+
+                    if (response.Headers.TryGetValues("Retry-After", out var values))
+                    {
+                        if (int.TryParse(values.FirstOrDefault(), out int secondsToWait))
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(secondsToWait));
+                        }
+                        else
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(5)); // fallback si no es numérico
+                        }
+                    }
+                    else
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5)); // fallback si no existe la cabecera
+                    }
+                }
+                else
+                {
+                    break; // Otros errores (404, 500, etc.) no se reintentan
+                }
             }
+
             return null;
         }
-        
+
+
         public static async Task<Artist> HandleRateLimitAndGetArtist(long artistId)
         {
-            await HandleRateLimit();
+            int maxRetries = 3;
+            int retries = 0;
 
-            var response = await _httpClient.GetAsync($"{DeezerApiUrl}/artist/{artistId}");
-            if (response.IsSuccessStatusCode)
+            while (retries < maxRetries)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                Artist artistData = JsonConvert.DeserializeObject<Artist>(content);
-                return artistData;
+                await HandleRateLimit();
+
+                var response = await _httpClient.GetAsync($"{DeezerApiUrl}/artist/{artistId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<Artist>(content);
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    retries++;
+                    // Intenta esperar el tiempo que diga la cabecera Retry-After, si está disponible
+                    if (response.Headers.TryGetValues("Retry-After", out var values))
+                    {
+                        if (int.TryParse(values.FirstOrDefault(), out int secondsToWait))
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(secondsToWait));
+                        }
+                        else
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(5)); // fallback
+                        }
+                    }
+                    else
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5)); // fallback
+                    }
+                }
+                else
+                {
+                    break; // otro error que no es 429
+                }
             }
+
             return null;
         }
 
         public static async Task<Genre> HandleRateLimitAndGetGenre(long genreId)
         {
-            await HandleRateLimit();
+            int maxRetries = 3;
+            int retries = 0;
 
-            var response = await _httpClient.GetAsync($"{DeezerApiUrl}/genre/{genreId}");
-            if (response.IsSuccessStatusCode)
+            while (retries < maxRetries)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                Genre genreData = JsonConvert.DeserializeObject<Genre>(content);
-                return genreData;
+                await HandleRateLimit(); // Medida preventiva, si es útil
+
+                var response = await _httpClient.GetAsync($"{DeezerApiUrl}/genre/{genreId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<Genre>(content);
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    retries++;
+
+                    if (response.Headers.TryGetValues("Retry-After", out var values) &&
+                        int.TryParse(values.FirstOrDefault(), out int secondsToWait))
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(secondsToWait));
+                    }
+                    else
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5)); // Espera por defecto si no hay header
+                    }
+                }
+                else
+                {
+                    break; // Otros errores (404, 500, etc.) no se reintentan
+                }
             }
+
             return null;
         }
+
+
 
         private static async Task HandleRateLimit()
         {
