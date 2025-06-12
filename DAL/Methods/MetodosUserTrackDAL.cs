@@ -108,7 +108,10 @@ namespace DAL.Methods
                         cmd.Parameters.AddWithValue(idAlbumParam, swipes[i].IdAlbum);
                         cmd.Parameters.AddWithValue(idArtistParam, swipes[i].IdArtist);
                         cmd.Parameters.AddWithValue(swipeParam, swipes[i].Like);
-                        cmd.Parameters.AddWithValue(dateParam, DateTime.Now);
+
+                        TimeZoneInfo cetZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+                        DateTime cetTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cetZone);
+                        cmd.Parameters.AddWithValue(dateParam, cetTime);
                     }
 
                     cmd.Parameters.AddWithValue("@uid", uid);
@@ -178,7 +181,9 @@ namespace DAL.Methods
                     conn.Open();
 
                     cmd.Parameters.Add("@uid", SqlDbType.VarChar).Value = uid;
-                    cmd.Parameters.Add("@date", SqlDbType.DateTime).Value = DateTime.Now;
+                    TimeZoneInfo cetZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+                    DateTime cetTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cetZone);
+                    cmd.Parameters.Add("@date", SqlDbType.DateTime).Value = cetTime;
                     cmd.Parameters.Add("@like", SqlDbType.Int).Value = simpleSwipe.Like;
                     cmd.Parameters.Add("@idTrack", SqlDbType.BigInt).Value = simpleSwipe.Id;
 
