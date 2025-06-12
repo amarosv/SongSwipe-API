@@ -21,7 +21,7 @@ namespace Entidades
         public String picture_big { get; set; }
         public String picture_xl { get; set; }
         public int nb_album {  get; set; }
-        public int nb_fans { get; set; }
+        public int nb_fan { get; set; }
         public bool radio { get; set; }
         public String tracklist { get; set; }
         public int likes { get; set; }
@@ -30,7 +30,7 @@ namespace Entidades
         #region Constructores
         public Artist() { }
 
-        public Artist(long id, string name, string link, string share, string picture, string pictureSmall, string pictureMedium, string pictureBig, string pictureXL, int nbAlbum, int nbFans, bool radio, string trackList)
+        public Artist(long id, string name, string link, string share, string picture, string pictureSmall, string pictureMedium, string pictureBig, string pictureXL, int nbAlbum, int nbFan, bool radio, string trackList)
         {
             this.id = id;
             this.name = name;
@@ -42,7 +42,7 @@ namespace Entidades
             picture_big = pictureBig;
             picture_xl = pictureXL;
             nb_album = nbAlbum;
-            nb_fans = nbFans;
+            nb_fan = nbFan;
             this.radio = radio;
             tracklist = trackList;
         }
