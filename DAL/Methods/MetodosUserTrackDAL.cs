@@ -100,19 +100,21 @@ namespace DAL.Methods
                         string idAlbumParam = $"@idAlbum{i}";
                         string idArtistParam = $"@idArtist{i}";
                         string swipeParam = $"@swipe{i}";
+                        string dateParam = $"@date{i}";
 
-                        valuesClauses.Add($"(@uid, {idTrackParam}, {idAlbumParam}, {idArtistParam}, {swipeParam})");
+                        valuesClauses.Add($"(@uid, {idTrackParam}, {idAlbumParam}, {idArtistParam}, {swipeParam}, {dateParam})");
 
                         cmd.Parameters.AddWithValue(idTrackParam, swipes[i].Id);
                         cmd.Parameters.AddWithValue(idAlbumParam, swipes[i].IdAlbum);
                         cmd.Parameters.AddWithValue(idArtistParam, swipes[i].IdArtist);
                         cmd.Parameters.AddWithValue(swipeParam, swipes[i].Like);
+                        cmd.Parameters.AddWithValue(dateParam, DateTime.Now);
                     }
 
                     cmd.Parameters.AddWithValue("@uid", uid);
 
                     cmd.CommandText = $@"
-                INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, IDArtist, Swipe)
+                INSERT INTO USERSWIPES (UID, IDTrack, IDAlbum, IDArtist, Swipe, DateSwipe)
                 VALUES {string.Join(", ", valuesClauses)}
             ";
 
