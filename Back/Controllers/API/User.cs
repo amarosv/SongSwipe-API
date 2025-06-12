@@ -130,7 +130,7 @@ namespace Back.Controllers.API
         }
 
         // GET api/<User>/email/a@a.com
-        [HttpGet("/email/{email}")]
+        [HttpGet("email/{email}")]
         [SwaggerOperation(
             Summary = "Obtiene los datos de un usuario específico",
             Description = "Este método obtiene todos los datos de un usuario especificado por su Email.<br>" +
