@@ -129,6 +129,46 @@ namespace Back.Controllers.API
             return salida;
         }
 
+        // GET api/<User>/email/a@a.com
+        [HttpGet("/email/{email}")]
+        [SwaggerOperation(
+            Summary = "Obtiene los datos de un usuario específico",
+            Description = "Este método obtiene todos los datos de un usuario especificado por su Email.<br>" +
+            "Si no se encuentra ningun usuario devuelve un mensaje de error."
+        )]
+        [SwaggerResponse(200, "Usuario con sus datos", typeof(Usuario))]
+        [SwaggerResponse(404, "No se ha encontrado ningún usuario con ese Email")]
+        [SwaggerResponse(500, "Error interno del servidor")]
+        public IActionResult GetUserByEmail(
+            [SwaggerParameter(Description = "Email del usuario a buscar")]
+            String email
+        )
+        {
+            IActionResult salida;
+
+            Usuario user;
+
+            try
+            {
+                user = MetodosUserDAL.getUserByEmailDAL(email);
+
+                if (user == null)
+                {
+                    salida = NotFound("No se ha encontrado ningún usuario con ese Email");
+                }
+                else
+                {
+                    salida = Ok(user);
+                }
+            }
+            catch (Exception ex)
+            {
+                salida = BadRequest(ex.Message);
+            }
+
+            return salida;
+        }
+
         // GET api/<User>/5/friends
         [HttpGet("{uid}/friends")]
         [SwaggerOperation(

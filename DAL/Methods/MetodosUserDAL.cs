@@ -61,6 +61,51 @@ namespace DAL.Methods
         }
 
         /// <summary>
+        /// Esta función recibe un Email de usuario, lo busca en la base de datos y devuelve el usuario
+        /// </summary>
+        /// <param name="email">Email del usuario a buscar</param>
+        /// <returns>Usuario</returns>
+        public static Usuario getUserByEmailDAL(string email)
+        {
+            Usuario user = null;
+
+            try
+            {
+                using (SqlConnection conn = clsConexion.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM USERS WHERE Email = @Email AND UserDeleted = 0 AND UserBlocked = 0", conn))
+                {
+                    cmd.Parameters.Add("@Email", SqlDbType.VarChar).Value = email;
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string uid = (string)reader["UID"];
+                                string name = (string)reader["Name"];
+                                string lastName = (string)reader["LastName"];
+                                string photoUrl = (string)reader["PhotoUrl"];
+                                string dateJoining = ((DateTime)reader["DateJoining"]).ToString();
+                                string username = (string)reader["Username"];
+                                string supplier = (string)reader["Supplier"];
+                                bool deleted = (bool)reader["UserDeleted"];
+                                bool blocked = (bool)reader["UserBlocked"];
+
+                                user = new Usuario(uid, name, lastName, email, photoUrl, dateJoining, username, supplier, deleted, blocked);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception) { throw; }
+
+            return user;
+        }
+
+
+        /// <summary>
         /// Esta función recibe un usuario y lo guarda en la base de datos
         /// </summary>
         /// <param name="user">Usuario</param>
